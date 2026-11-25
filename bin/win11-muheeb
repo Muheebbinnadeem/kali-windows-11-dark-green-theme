@@ -1,0 +1,28 @@
+#!/usr/bin/env bash
+# CLI Manager for Windows 11 Dark Green Theme — Made by Muheeb
+set -euo pipefail
+INSTALL_DIR="$HOME/.local/share/win11-muheeb"
+SHELL_PY="$INSTALL_DIR/shell/win11_shell.py"
+
+case "${1:-help}" in
+    apply)
+        python3 "$INSTALL_DIR/bin/configure_xfce_win11.py"
+        ;;
+    start|search|control|notifications|widgets|winver)
+        exec python3 "$SHELL_PY" "$1"
+        ;;
+    about)
+        exec python3 "$SHELL_PY" winver
+        ;;
+    restore)
+        if [ -f "$INSTALL_DIR/../win11-muheeb/backup/.backed_up" ] || [ -d "$INSTALL_DIR/backup" ]; then
+            bash "$(dirname "$0")/../uninstall.sh" 2>/dev/null || {
+                echo "Run ./uninstall.sh from your Window Theme Repo to restore fully."
+            }
+        fi
+        ;;
+    *)
+        echo "Windows 11 Pro (Dark Green Edition) — Made by Muheeb"
+        echo "Usage: win11-muheeb [apply | start | search | control | notifications | widgets | winver]"
+        ;;
+esac
