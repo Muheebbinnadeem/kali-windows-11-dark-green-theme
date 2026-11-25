@@ -1,8 +1,16 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">
-  <rect x="4" y="8" width="40" height="32" rx="5" fill="#111C17" stroke="#2D4A3E" stroke-width="1.5"/>
-  <path d="M4 13a5 5 0 0 1 5-5h11v6H4v-1z" fill="#1E3329"/>
-  <path d="M20 8h11v6H20z" fill="#182921"/>
-  <path d="M31 8h8a5 5 0 0 1 5 5v1H31V8z" fill="#14231C"/>
-  <path d="M12 21l7 5.5L12 32" fill="none" stroke="#ECFDF5" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-  <line x1="23" y1="32" x2="33" y2="32" stroke="#34D399" stroke-width="3" stroke-linecap="round"/>
+  <defs>
+    <linearGradient id="wt_body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#33423B"/>
+      <stop offset="100%" stop-color="#1E2924"/>
+    </linearGradient>
+  </defs>
+  <!-- Distinct Windows Terminal Top Tab Strip -->
+  <path d="M5 13a4 4 0 0 1 4-4h10l2 5H5v-1z" fill="#9CB8AC"/>
+  <path d="M19 9h11l2 5H19V9z" fill="#688578"/>
+  <path d="M30 9h9a4 4 0 0 1 4 4v1H30V9z" fill="#4B6358"/>
+  <!-- Crisp Terminal Body -->
+  <rect x="5" y="14" width="38" height="26" rx="3.5" fill="url(#wt_body)" stroke="#5E7D6F" stroke-width="1.2"/>
+  <path d="M13 22l6.5 5L13 32" fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="23" y1="32" x2="32" y2="32" stroke="#34D399" stroke-width="2.8" stroke-linecap="round"/>
 </svg>

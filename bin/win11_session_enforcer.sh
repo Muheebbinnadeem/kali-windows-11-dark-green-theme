@@ -48,7 +48,12 @@ if [ -f "$WALL_DARK" ]; then
     done
 fi
 
-# 4. Ensure Windows Key solo tap triggers <Primary>Escape -> Windows 11 Start Menu
+# 4. Replace xfce4-panel with Native Windows 11 Dock Taskbar on every boot/login
+xfce4-panel -q >/dev/null 2>&1 || true
+pkill -f win11_taskbar.py >/dev/null 2>&1 || true
+nohup python3 "$INSTALL_DIR/shell/win11_taskbar.py" >/dev/null 2>&1 &
+
+# 5. Ensure Windows Key solo tap triggers <Primary>Escape -> Windows 11 Start Menu
 if command -v xcape >/dev/null 2>&1; then
     pkill -x xcape >/dev/null 2>&1 || true
     xcape -e 'Super_L=Control_L|Escape;Super_R=Control_L|Escape' >/dev/null 2>&1 &

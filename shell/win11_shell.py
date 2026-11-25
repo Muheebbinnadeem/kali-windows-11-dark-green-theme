@@ -496,6 +496,79 @@ def make_win11_logo_drawing(size=24):
     return area
 
 
+def make_qs_cairo_icon(kind, size=20):
+    """Crisp monochrome white Windows 11 Segoe Fluent vector icons for Quick Settings."""
+    area = Gtk.DrawingArea()
+    area.set_size_request(size, size)
+    area.set_halign(Gtk.Align.CENTER)
+    area.set_valign(Gtk.Align.CENTER)
+
+    def _draw(widget, ctx):
+        cx, cy = size / 2.0, size / 2.0
+        ctx.set_source_rgba(0.97, 1.0, 0.98, 0.98)
+        ctx.set_line_width(1.7)
+        ctx.set_line_cap(cairo.LINE_CAP_ROUND)
+        ctx.set_line_join(cairo.LINE_JOIN_ROUND)
+
+        if kind == "wifi":
+            by = cy + 6.0
+            for r in (3.8, 7.2, 10.6):
+                ctx.new_sub_path()
+                ctx.arc(cx, by, r, -3.14159 * 0.76, -3.14159 * 0.24)
+                ctx.stroke()
+            ctx.arc(cx, by + 0.2, 1.5, 0, 6.283)
+            ctx.fill()
+
+        elif kind == "bluetooth":
+            ctx.move_to(cx - 4.0, cy - 4.2)
+            ctx.line_to(cx + 4.2, cy + 4.0)
+            ctx.line_to(cx, cy + 8.0)
+            ctx.line_to(cx, cy - 8.0)
+            ctx.line_to(cx + 4.2, cy - 4.0)
+            ctx.line_to(cx - 4.0, cy + 4.2)
+            ctx.stroke()
+
+        elif kind == "airplane":
+            ctx.move_to(cx, cy - 7.5)
+            ctx.line_to(cx, cy + 7.5)
+            ctx.move_to(cx - 7.5, cy + 1.0)
+            ctx.line_to(cx, cy - 2.5)
+            ctx.line_to(cx + 7.5, cy + 1.0)
+            ctx.move_to(cx - 3.5, cy + 7.0)
+            ctx.line_to(cx, cy + 5.0)
+            ctx.line_to(cx + 3.5, cy + 7.0)
+            ctx.stroke()
+
+        elif kind == "battery":
+            ctx.rectangle(cx - 7.5, cy - 4.5, 13.5, 9.0)
+            ctx.stroke()
+            ctx.move_to(cx + 7.8, cy - 2.2)
+            ctx.line_to(cx + 7.8, cy + 2.2)
+            ctx.stroke()
+            ctx.rectangle(cx - 5.2, cy - 2.2, 6.5, 4.4)
+            ctx.fill()
+
+        elif kind == "night":
+            ctx.arc(cx + 1.5, cy, 6.2, 0.65, 5.15)
+            ctx.stroke()
+            ctx.arc(cx - 2.5, cy - 2.5, 2.2, 0, 6.283)
+            ctx.fill()
+
+        elif kind == "dnd":
+            ctx.arc(cx, cy - 1.2, 4.8, 3.14159, 6.283)
+            ctx.line_to(cx + 4.8, cy + 3.2)
+            ctx.line_to(cx - 4.8, cy + 3.2)
+            ctx.close_path()
+            ctx.stroke()
+            ctx.move_to(cx - 6.5, cy - 6.5)
+            ctx.line_to(cx + 6.5, cy + 6.5)
+            ctx.stroke()
+        return False
+
+    area.connect("draw", _draw)
+    return area
+
+
 class BaseFlyout(Gtk.Window):
     def __init__(self, width, height, align="center", close_on_blur=True):
         super().__init__(type=Gtk.WindowType.TOPLEVEL)
@@ -508,40 +581,55 @@ class BaseFlyout(Gtk.Window):
         self.set_app_paintable(True)
         self.set_size_request(width, height)
         self.set_default_size(width, height)
+        self._align = align
+        self._last_alloc = (0, 0)
 
         screen = self.get_screen()
         visual = screen.get_rgba_visual()
         if visual and screen.is_composited():
             self.set_visual(visual)
 
-        mx, my, mw, mh = get_primary_geometry()
-        panel_h = 56
-        gap = 14
-        if align == "center":
-            x = mx + (mw - width) // 2
-            y = my + mh - panel_h - height - gap
-        elif align == "right":
-            x = mx + mw - width - gap
-            y = my + mh - panel_h - height - gap
-        elif align == "left":
-            x = mx + gap
-            y = my + mh - panel_h - height - gap
-        elif align == "top-center":
-            x = mx + (mw - width) // 2
-            y = my + 22
-        else:
-            x = mx + (mw - width) // 2
-            y = my + (mh - height) // 2
-
-        self.target_pos = (x, y)
-        self.move(x, y)
+        self.target_pos = self._calc_clamped_pos(width, height)
+        self.move(*self.target_pos)
         self._created_at = time.monotonic()
 
         self.connect("draw", self._on_transparent_draw)
+        self.connect("size-allocate", self._on_size_allocate)
         self.connect("key-press-event", self._on_key)
         self.connect("destroy", lambda *_: (cleanup_state(), Gtk.main_quit()))
         if close_on_blur:
             self.connect("focus-out-event", self._on_focus_out)
+
+    def _calc_clamped_pos(self, w, h):
+        mx, my, mw, mh = get_primary_geometry()
+        panel_h = 56
+        gap = 12
+        if self._align == "center":
+            x = mx + (mw - w) // 2
+            y = my + mh - panel_h - h - gap
+        elif self._align == "right":
+            x = mx + mw - w - gap
+            y = my + mh - panel_h - h - gap
+        elif self._align == "left":
+            x = mx + gap
+            y = my + mh - panel_h - h - gap
+        elif self._align == "top-center":
+            x = mx + (mw - w) // 2
+            y = my + 22
+        else:
+            x = mx + (mw - w) // 2
+            y = my + (mh - h) // 2
+
+        # Strict screen-boundary clamping so NO flyout can EVER go off-screen!
+        x = max(mx + 8, min(x, mx + mw - w - 8))
+        y = max(my + 8, min(y, my + mh - panel_h - h - 8))
+        return x, y
+
+    def _on_size_allocate(self, widget, alloc):
+        if (alloc.width, alloc.height) != self._last_alloc and alloc.width > 50:
+            self._last_alloc = (alloc.width, alloc.height)
+            self.target_pos = self._calc_clamped_pos(alloc.width, alloc.height)
+            self.move(*self.target_pos)
 
     def _on_transparent_draw(self, widget, ctx):
         ctx.set_source_rgba(0, 0, 0, 0)
@@ -1190,7 +1278,7 @@ class CustomizableSearchFlyout(BaseFlyout):
 # ==============================================================================
 class ControlCenterFlyout(BaseFlyout):
     def __init__(self):
-        super().__init__(428, 530, align="right")
+        super().__init__(396, 510, align="right")
 
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         card.get_style_context().add_class("mica-card")
@@ -1261,26 +1349,27 @@ class ControlCenterFlyout(BaseFlyout):
         saver_on = run_cmd("powerprofilesctl get") == "power-saver"
         nl_on = os.path.exists(NIGHTLIGHT_STATE)
 
-        # Tile 0: Split Wi-Fi Button (Toggle + '>' Manage Networks)
+        # Tile 0: Split Wi-Fi Button (Crisp Icon + '>' Manage Networks)
         grid.attach(
-            self._make_split_tile("Wi-Fi", ssid[:13], wifi_on, self._toggle_wifi, lambda *_: self._open_wifi_page()),
+            self._make_split_tile("wifi", ssid[:14], wifi_on, self._toggle_wifi, lambda *_: self._open_wifi_page()),
             0, 0, 1, 1,
         )
-        # Tile 1: Split Bluetooth Button (Toggle + '>' Manage Devices)
+        # Tile 1: Split Bluetooth Button (Crisp Icon + '>' Manage Devices)
         grid.attach(
-            self._make_split_tile("Bluetooth", "On" if bt_on else "Off", bt_on, self._toggle_bt, lambda *_: self._open_bt_page()),
+            self._make_split_tile("bluetooth", "Bluetooth" if bt_on else "Off", bt_on, self._toggle_bt, lambda *_: self._open_bt_page()),
             1, 0, 1, 1,
         )
-        # Tiles 2..5
+        # Tiles 2..5 with Crisp Monochrome Windows 11 Vector Icons!
         simple_tiles = [
-            ("Airplane", not wifi_on, self._toggle_airplane),
-            ("Battery saver", saver_on, self._toggle_saver),
-            ("Night light", nl_on, self._toggle_nightlight),
-            ("Focus / DND", dnd_on, self._toggle_dnd),
+            ("airplane", "Airplane mode", not wifi_on, self._toggle_airplane),
+            ("battery", "Battery saver", saver_on, self._toggle_saver),
+            ("night", "Night light", nl_on, self._toggle_nightlight),
+            ("dnd", "Focus assist", dnd_on, self._toggle_dnd),
         ]
-        for idx, (cap_txt, active, handler) in enumerate(simple_tiles, start=2):
-            cell = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-            btn = Gtk.Button(label=cap_txt.split()[0])
+        for idx, (icon_kind, cap_txt, active, handler) in enumerate(simple_tiles, start=2):
+            cell = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
+            btn = Gtk.Button()
+            btn.add(make_qs_cairo_icon(icon_kind, 20))
             btn.get_style_context().add_class("qs-tile-active" if active else "qs-tile")
             cap = Gtk.Label(label=cap_txt)
             cap.get_style_context().add_class("qs-caption")
@@ -1341,10 +1430,11 @@ class ControlCenterFlyout(BaseFlyout):
         body.pack_end(hint_row, False, False, 0)
         return body
 
-    def _make_split_tile(self, title, sub, active, toggle_cb, arrow_cb):
-        cell = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
+    def _make_split_tile(self, icon_kind, sub, active, toggle_cb, arrow_cb):
+        cell = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=5)
         hb = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=0)
-        left_b = Gtk.Button(label=title)
+        left_b = Gtk.Button()
+        left_b.add(make_qs_cairo_icon(icon_kind, 20))
         right_b = Gtk.Button(label="›")
         cls = "qs-tile-active" if active else "qs-tile"
         left_b.get_style_context().add_class(cls)
@@ -2057,8 +2147,12 @@ class RunDialog(BaseFlyout):
 
 
 class WinXMenu(BaseFlyout):
+    """Authentic Windows 11 Win+X Power Menu — supports Win+X -> U -> U (Shut down), U -> R (Restart), U -> S (Sleep), U -> I (Sign out)!"""
+
     def __init__(self):
-        super().__init__(250, 420, align="left")
+        super().__init__(290, 490, align="left")
+        self.u_submenu_open = False
+
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=2)
         card.get_style_context().add_class("mica-card")
         self.add(card)
@@ -2071,20 +2165,26 @@ class WinXMenu(BaseFlyout):
         card.pack_start(inner, True, True, 0)
 
         me = os.path.abspath(__file__)
+        self.key_actions = {
+            "a": f"python3 '{me}' control",
+            "n": f"python3 '{me}' settings",
+            "e": "thunar",
+            "s": f"python3 '{me}' search",
+            "r": f"python3 '{me}' run",
+            "t": "qterminal || xfce4-terminal",
+            "m": "xfce4-taskmanager",
+        }
         items = [
             ("Installed Apps", "xfce4-appfinder"),
-            ("Wi-Fi & Bluetooth (Win+A)", f"python3 '{me}' control"),
-            ("Power & Battery", "xfce4-power-manager-settings"),
+            ("Wi-Fi & Bluetooth  (A)", f"python3 '{me}' control"),
+            ("Power Options", "xfce4-power-manager-settings"),
             ("System About (winver)", f"python3 '{me}' winver"),
-            ("Terminal", "qterminal || xfce4-terminal"),
-            ("Terminal (Admin)", "pkexec qterminal || qterminal"),
-            ("Task Manager (Ctrl+Shift+Esc)", "xfce4-taskmanager"),
-            ("Personalize & Search (Win+I)", f"python3 '{me}' settings"),
-            ("File Explorer (Win+E)", "thunar"),
-            ("Search (Win+S)", f"python3 '{me}' search"),
-            ("Snipping Tool (Win+Shift+S)", f"python3 '{me}' snip"),
-            ("Run (Win+R)", f"python3 '{me}' run"),
-            ("Lock Screen (Win+L)", "xflock4"),
+            ("Terminal  (T)", "qterminal || xfce4-terminal"),
+            ("Task Manager  (M)", "xfce4-taskmanager"),
+            ("Settings  (N)", f"python3 '{me}' settings"),
+            ("File Explorer  (E)", "thunar"),
+            ("Search  (S)", f"python3 '{me}' search"),
+            ("Run  (R)", f"python3 '{me}' run"),
         ]
         for lbl, cmd in items:
             b = Gtk.Button(label=lbl)
@@ -2092,6 +2192,73 @@ class WinXMenu(BaseFlyout):
             b.get_child().set_xalign(0)
             b.connect("clicked", lambda _, c=cmd: (spawn_detached(c), self.close_flyout()))
             inner.pack_start(b, False, False, 0)
+
+        inner.pack_start(Gtk.Separator(orientation=Gtk.Orientation.HORIZONTAL), False, False, 4)
+
+        # Shut down or sign out (U) > Submenu (Win + X -> U -> U / R / S / I)
+        self.u_btn = Gtk.Button(label="Shut down or sign out  (U)   ▸")
+        self.u_btn.get_style_context().add_class("rec-row")
+        self.u_btn.get_child().set_xalign(0)
+        self.u_btn.connect("clicked", lambda *_: self._open_u_submenu())
+        inner.pack_start(self.u_btn, False, False, 0)
+
+        self.u_revealer = Gtk.Revealer()
+        self.u_revealer.set_transition_type(Gtk.RevealerTransitionType.SLIDE_DOWN)
+        ubox = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=3)
+        ubox.get_style_context().add_class("widget-subcard")
+        for ulbl, ucmd in [
+            ("🚪  Sign out  (I)", "xfce4-session-logout --logout --fast || xfce4-session-logout --logout"),
+            ("🌙  Sleep  (S)", "systemctl suspend"),
+            ("⏻  Shut down  (U)", "systemctl poweroff || poweroff"),
+            ("🔄  Restart  (R)", "systemctl reboot || reboot"),
+        ]:
+            ub = Gtk.Button(label=ulbl)
+            ub.get_style_context().add_class("pill-btn")
+            ub.get_child().set_xalign(0)
+            ub.connect("clicked", lambda _, c=ucmd: (spawn_detached(c), self.close_flyout()))
+            ubox.pack_start(ub, False, False, 0)
+        self.u_revealer.add(ubox)
+        inner.pack_start(self.u_revealer, False, False, 0)
+
+        d_btn = Gtk.Button(label="Desktop  (D)")
+        d_btn.get_style_context().add_class("rec-row")
+        d_btn.get_child().set_xalign(0)
+        d_btn.connect("clicked", lambda *_: (spawn_detached("wmctrl -k on || xdotool key super+d"), self.close_flyout()))
+        inner.pack_start(d_btn, False, False, 0)
+
+        self.connect("key-press-event", self._on_winx_key)
+
+    def _open_u_submenu(self):
+        self.u_submenu_open = True
+        self.u_btn.get_style_context().add_class("accent-btn")
+        self.u_revealer.set_reveal_child(True)
+
+    def _on_winx_key(self, widget, event):
+        ch = chr(Gdk.keyval_to_lower(event.keyval)) if 32 <= event.keyval <= 126 else ""
+        if not ch:
+            return False
+
+        if not self.u_submenu_open:
+            if ch == "u":
+                self._open_u_submenu()
+                return True
+            if ch in self.key_actions:
+                spawn_detached(self.key_actions[ch])
+                self.close_flyout()
+                return True
+        else:
+            # Second key after pressing 'U': U = Shut down, R = Restart, S = Sleep, I = Sign out!
+            power_map = {
+                "u": "systemctl poweroff || poweroff",
+                "r": "systemctl reboot || reboot",
+                "s": "systemctl suspend",
+                "i": "xfce4-session-logout --logout --fast || xfce4-session-logout --logout",
+            }
+            if ch in power_map:
+                spawn_detached(power_map[ch])
+                self.close_flyout()
+                return True
+        return False
 
 
 # ==============================================================================

@@ -63,7 +63,7 @@ Open your Kali Linux terminal and run:
 
 ```bash
 # 1. Clone this repository
-git clone https://github.com/muheeb/kali-windows-11-dark-green-theme.git "Window Theme Repo"
+git clone https://github.com/Muheebbinnadeem/kali-windows-11-dark-green-theme.git "Window Theme Repo"
 cd "Window Theme Repo"
 
 # 2. Make installer & uninstaller executable

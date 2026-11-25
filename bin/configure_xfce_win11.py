@@ -200,28 +200,29 @@ def main():
     xfset("xsettings", "/Net/ThemeName", "string", "Win11-Muheeb-Green-Dark")
     xfset("xsettings", "/Net/IconThemeName", "string", "Win11-green-dark")
     xfset("xsettings", "/Gtk/CursorThemeName", "string", "Win11-Cursors-Dark")
-    xfset("xsettings", "/Gtk/CursorThemeSize", "int", "28")
-    xfset("xsettings", "/Gtk/FontName", "string", "Inter 10.5")
+    xfset("xsettings", "/Gtk/CursorThemeSize", "int", "30")
+    xfset("xsettings", "/Gtk/FontName", "string", "Inter 11")
     xfset("xsettings", "/Gtk/DecorationLayout", "string", "icon:minimize,maximize,close")
-    xfset("xsettings", "/Xft/DPI", "int", "120")
+    xfset("xsettings", "/Xft/DPI", "int", "122")
 
     sh("gsettings set org.gnome.desktop.interface gtk-theme 'Win11-Muheeb-Green-Dark'")
     sh("gsettings set org.gnome.desktop.interface icon-theme 'Win11-green-dark'")
     sh("gsettings set org.gnome.desktop.interface cursor-theme 'Win11-Cursors-Dark'")
-    sh("gsettings set org.gnome.desktop.interface cursor-size 28")
+    sh("gsettings set org.gnome.desktop.interface cursor-size 30")
     sh("gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'")
-    sh("gsettings set org.gnome.desktop.interface font-name 'Inter 10.5'")
+    sh("gsettings set org.gnome.desktop.interface font-name 'Inter 11'")
+    sh("gsettings set org.gnome.desktop.interface text-scaling-factor 1.20")
 
     xfset("xfwm4", "/general/theme", "string", "Win11-Muheeb-Green-Dark")
     xfset("xfwm4", "/general/button_layout", "string", "O|HMC")
     xfset("xfwm4", "/general/title_alignment", "string", "left")
-    xfset("xfwm4", "/general/title_font", "string", "Inter Semi-Bold 10")
+    xfset("xfwm4", "/general/title_font", "string", "Inter Semi-Bold 10.5")
     xfset("xfwm4", "/general/use_compositing", "bool", "true")
     xfset("xfwm4", "/general/show_popup_shadow", "bool", "false")
     xfset("xfwm4", "/general/show_dock_shadow", "bool", "false")
     xfset("xfwm4", "/general/tile_on_move", "bool", "true")
 
-    # 2. Wallpaper & 125% Windows 11 Desktop Icon Size (52px icons, 10pt label)
+    # 2. Wallpaper & 125% Windows 11 Desktop Icon Size (58px icons, 10.5pt label)
     for p in subprocess.run(["xfconf-query", "-c", "xfce4-desktop", "-l"], capture_output=True, text=True).stdout.splitlines():
         if p.endswith("/last-image") or p.endswith("/image-path"):
             xfset("xfce4-desktop", p, "string", wall_dark)
@@ -230,15 +231,15 @@ def main():
 
     xfset("xfce4-desktop", "/backdrop/screen0/monitoreDP-1/workspace0/last-image", "string", wall_dark)
     xfset("xfce4-desktop", "/backdrop/screen0/monitoreDP-1/workspace0/image-style", "int", "5")
-    xfset("xfce4-desktop", "/desktop-icons/icon-size", "int", "52")
-    xfset("xfce4-desktop", "/desktop-icons/font-size", "double", "10.0")
+    xfset("xfce4-desktop", "/desktop-icons/icon-size", "int", "58")
+    xfset("xfce4-desktop", "/desktop-icons/font-size", "double", "10.5")
     xfset("xfce4-desktop", "/desktop-icons/use-custom-font-size", "bool", "true")
 
-    # 3. Thunar File Explorer (125% Scale & Spacious Sidebar)
+    # 3. Thunar File Explorer (125%+ Spacious Folders & Sidebar)
     xfset("thunar", "/last-location-bar", "string", "ThunarLocationEntry")
     xfset("thunar", "/last-side-pane", "string", "THUNAR_SIDEPANE_TYPE_SHORTCUTS")
-    xfset("thunar", "/last-separator-position", "int", "250")
-    xfset("thunar", "/last-icon-view-zoom-level", "string", "THUNAR_ZOOM_LEVEL_100_PERCENT")
+    xfset("thunar", "/last-separator-position", "int", "260")
+    xfset("thunar", "/last-icon-view-zoom-level", "string", "THUNAR_ZOOM_LEVEL_150_PERCENT")
     xfset("thunar", "/last-statusbar-visible", "bool", "true")
     xfset("thunar", "/last-menubar-visible", "bool", "false")
     xfset("thunar", "/misc-symbolic-icons-in-toolbar", "bool", "true")
@@ -264,129 +265,18 @@ def main():
     xfset("xfce4-notifyd", "/notify-location", "uint", "3")
     configure_all_win11_shortcuts(shell_py)
 
-    # 5. Exact Windows 11 Taskbar (48px height, 24px centered app icons, 16px clean monochrome right tray)
+    # 5. Launch Native Windows 11 Dock Taskbar (replaces xfce4-panel cleanly: zero '⋮⋮' handles, merged running apps!)
     sh("xfce4-panel -q")
-
-    create_genmon(200, f"python3 '{pill_py}' widgets", 10000)
-    create_genmon(219, f"python3 '{pill_py}' spacer", 3600000)  # Left-Right width balance for dead-center icons!
-    create_separator(201, expand=True)
-
-    create_launcher(
-        220, "Start", "Start (Win)",
-        f"python3 '{shell_py}' start",
-        os.path.join(icons_dir, "win11-start.svg"),
-    )
-    create_genmon(202, f"python3 '{pill_py}' search", 30000)
-    create_launcher(
-        203, "Task View", "Task View (Win+Tab)",
-        "rofi -show window -theme-str 'window {background-color: #111C17; border: 1px solid #34D399; border-radius: 10px; width: 50%;}'",
-        os.path.join(icons_dir, "win11-taskview.svg"),
-    )
-    create_launcher(
-        204, "File Explorer", "File Explorer (Win+E) • Made by Muheeb",
-        "thunar",
-        os.path.join(icons_dir, "win11-explorer.svg"),
-    )
-    create_launcher(
-        205, "Windows Terminal", "Terminal",
-        "sh -c 'qterminal || xfce4-terminal || x-terminal-emulator'",
-        os.path.join(icons_dir, "win11-terminal.svg"),
-    )
-    browser_cmd = "brave-browser" if shutil.which("brave-browser") else "firefox"
-    browser_icon = "brave-browser" if shutil.which("brave-browser") else "firefox-esr"
-    create_launcher(206, "Browser", "Web Browser", browser_cmd, browser_icon)
-    editor_cmd = "code" if shutil.which("code") else "mousepad"
-    editor_icon = "code" if shutil.which("code") else "org.xfce.mousepad"
-    create_launcher(207, "VS Code", "Code Editor", editor_cmd, editor_icon)
-    create_launcher(
-        208, "Settings", "Windows 11 Settings (Win+I) • Made by Muheeb",
-        f"python3 '{shell_py}' settings",
-        os.path.join(icons_dir, "win11-settings.svg"),
-    )
-
-    xfreset("xfce4-panel", "/plugins/plugin-209")
-    xfset("xfce4-panel", "/plugins/plugin-209", "string", "tasklist")
-    xfset("xfce4-panel", "/plugins/plugin-209/show-labels", "bool", "false")
-    xfset("xfce4-panel", "/plugins/plugin-209/flat-buttons", "bool", "true")
-    xfset("xfce4-panel", "/plugins/plugin-209/show-handle", "bool", "false")
-    xfset("xfce4-panel", "/plugins/plugin-209/grouping", "int", "1")
-
-    create_separator(215, expand=True)
-
-    # Plugin 210: Hidden Icons '^' Chevron ONLY (hide ibus/nm-applet/blueman behind '^' popup like Win11!)
-    xfreset("xfce4-panel", "/plugins/plugin-210")
-    xfset("xfce4-panel", "/plugins/plugin-210", "string", "systray")
-    xfset("xfce4-panel", "/plugins/plugin-210/size-max", "int", "16")
-    xfset("xfce4-panel", "/plugins/plugin-210/square-icons", "bool", "true")
-    xfset("xfce4-panel", "/plugins/plugin-210/symbolic-icons", "bool", "true")
-    xfset("xfce4-panel", "/plugins/plugin-210/hide-new-items", "bool", "true")
-    subprocess.run(
-        [
-            "xfconf-query", "-c", "xfce4-panel", "-p", "/plugins/plugin-210/hidden-legacy-items",
-            "-n", "-a",
-            "-t", "string", "-s", "ibus panel",
-            "-t", "string", "-s", "networkmanager applet",
-            "-t", "string", "-s", "onboard",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    subprocess.run(
-        [
-            "xfconf-query", "-c", "xfce4-panel", "-p", "/plugins/plugin-210/hidden-items",
-            "-n", "-a",
-            "-t", "string", "-s", "blueman",
-            "-t", "string", "-s", "ibus-ui-gtk3",
-        ],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-
-    create_genmon(211, f"python3 '{pill_py}' lang", 60000)
-    create_genmon(212, f"python3 '{pill_py}' control", 3000)
-    create_genmon(213, f"python3 '{pill_py}' clock", 10000)
-
-    xfreset("xfce4-panel", "/plugins/plugin-214")
-    xfset("xfce4-panel", "/plugins/plugin-214", "string", "showdesktop")
-
-    plugin_order = [200, 219, 201, 220, 202, 203, 204, 205, 206, 207, 208, 209, 215, 210, 211, 212, 213, 214]
-    subprocess.run(
-        ["xfconf-query", "-c", "xfce4-panel", "-p", "/panels", "-n", "-a", "-t", "int", "-s", "1"],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
-    )
-    xfset("xfce4-panel", "/panels/dark-mode", "bool", "true")
-    xfset("xfce4-panel", "/panels/panel-1/position", "string", "p=8;x=960;y=1052")
-    xfset("xfce4-panel", "/panels/panel-1/length", "double", "100")
-    xfset("xfce4-panel", "/panels/panel-1/length-adjust", "bool", "false")
-    xfset("xfce4-panel", "/panels/panel-1/mode", "int", "0")
-    xfset("xfce4-panel", "/panels/panel-1/nrows", "int", "1")
-    xfset("xfce4-panel", "/panels/panel-1/size", "int", "56")
-    xfset("xfce4-panel", "/panels/panel-1/icon-size", "int", "28")
-    xfset("xfce4-panel", "/panels/panel-1/autohide-behavior", "int", "0")
-    xfset("xfce4-panel", "/panels/panel-1/position-locked", "bool", "true")
-    xfset("xfce4-panel", "/panels/panel-1/background-style", "int", "0")
-    xfset("xfce4-panel", "/panels/panel-1/enter-opacity", "int", "100")
-    xfset("xfce4-panel", "/panels/panel-1/leave-opacity", "int", "100")
-
-    xfreset("xfce4-panel", "/panels/panel-1/plugin-ids")
-    cmd = ["xfconf-query", "-c", "xfce4-panel", "-p", "/panels/panel-1/plugin-ids", "-n", "-a"]
-    for pid in plugin_order:
-        cmd.extend(["-t", "int", "-s", str(pid)])
-    subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-
-    # Pre-warm Cairo taskbar PNGs before starting panel
-    for kind in ("widgets", "spacer", "search", "lang", "control", "clock"):
-        sh(f"python3 '{pill_py}' {kind}")
-
+    sh("pkill -f win11_taskbar.py")
+    taskbar_py = os.path.join(install_dir, "shell", "win11_taskbar.py")
     subprocess.Popen(
-        "nohup xfce4-panel --disable-wm-check >/dev/null 2>&1 &",
+        f"nohup python3 '{taskbar_py}' >/dev/null 2>&1 &",
         shell=True,
         start_new_session=True,
     )
     sh("xfdesktop --reload")
     sh("thunar -q")
-    print("Configured Permanent 96-DPI Windows 11 Dark Green Desktop (Made by Muheeb).")
+    print("Configured Permanent 125% Windows 11 Dark Green Desktop with Native Win11 Dock Taskbar (Made by Muheeb).")
 
 
 if __name__ == "__main__":

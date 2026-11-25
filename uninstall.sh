@@ -9,6 +9,7 @@ INSTALL_DIR="$HOME/.local/share/win11-muheeb"
 BACKUP_DIR="$INSTALL_DIR/backup"
 
 echo "[*] Restoring original Kali Linux XFCE desktop configuration..."
+pkill -f win11_taskbar.py >/dev/null 2>&1 || true
 
 # Remove Win11 autostart overrides so original Kali applets return cleanly
 rm -f "$HOME/.config/autostart/win11-muheeb-session.desktop" \
