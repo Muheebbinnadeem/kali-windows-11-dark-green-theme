@@ -1,33 +1,45 @@
 #!/usr/bin/env bash
 # ==============================================================================
-#  Windows 11 Dark Green Session Enforcer — Made by Muheeb
-#  Runs automatically at every login so Kali ALWAYS opens in exact Win11 mode:
-#   - Kills duplicate nm-applet / blueman tray applets (managed inside Quick Settings)
-#   - Enforces 96-DPI original Windows 11 font/icon/cursor/window theme & wallpaper
-#   - Starts xcape so solo Windows key tap opens Win11 Start Menu cleanly
+#  Windows 11 Dark Green Session Enforcer (125% Scale Default) — Made by Muheeb
 # ==============================================================================
 INSTALL_DIR="$HOME/.local/share/win11-muheeb"
 WALL_DARK="$INSTALL_DIR/wallpapers/win11-muheeb-dark.png"
+SETTINGS_JSON="$HOME/.config/win11-muheeb/settings.json"
 
 # 1. Stop separate Linux Wi-Fi / Bluetooth tray icons (managed inside Win+A Quick Settings)
 pkill -f nm-applet >/dev/null 2>&1 || true
 pkill -f blueman-applet >/dev/null 2>&1 || true
 pkill -f blueman-tray >/dev/null 2>&1 || true
 
-# 2. Enforce exact Windows 11 96-DPI theme, icons, cursors & fonts
+# Read user's chosen scale percentage (defaults to 125% -> 120 DPI)
+DPI_VAL=$(python3 - <<'PY'
+import json, os
+p = os.path.expanduser("~/.config/win11-muheeb/settings.json")
+scale = 125
+if os.path.isfile(p):
+    try:
+        scale = int(json.load(open(p)).get("scale_pct", 125))
+    except Exception:
+        pass
+print(max(96, min(168, int(round(96 * scale / 100.0)))))
+PY
+)
+
+# 2. Enforce Windows 11 125% (120 DPI) theme, icons, cursors & fonts
 xfconf-query -c xsettings -p /Net/ThemeName -n -t string -s "Win11-Muheeb-Green-Dark" 2>/dev/null || true
 xfconf-query -c xsettings -p /Net/IconThemeName -n -t string -s "Win11-green-dark" 2>/dev/null || true
 xfconf-query -c xsettings -p /Gtk/CursorThemeName -n -t string -s "Win11-Cursors-Dark" 2>/dev/null || true
-xfconf-query -c xsettings -p /Gtk/CursorThemeSize -n -t int -s 24 2>/dev/null || true
-xfconf-query -c xsettings -p /Gtk/FontName -n -t string -s "Inter 9.5" 2>/dev/null || true
-xfconf-query -c xsettings -p /Xft/DPI -n -t int -s 96 2>/dev/null || true
+xfconf-query -c xsettings -p /Gtk/CursorThemeSize -n -t int -s 28 2>/dev/null || true
+xfconf-query -c xsettings -p /Gtk/FontName -n -t string -s "Inter 10.5" 2>/dev/null || true
+xfconf-query -c xsettings -p /Xft/DPI -n -t int -s "$DPI_VAL" 2>/dev/null || true
 xfconf-query -c xfwm4 -p /general/theme -n -t string -s "Win11-Muheeb-Green-Dark" 2>/dev/null || true
 
 gsettings set org.gnome.desktop.interface gtk-theme 'Win11-Muheeb-Green-Dark' 2>/dev/null || true
 gsettings set org.gnome.desktop.interface icon-theme 'Win11-green-dark' 2>/dev/null || true
 gsettings set org.gnome.desktop.interface cursor-theme 'Win11-Cursors-Dark' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface cursor-size 28 2>/dev/null || true
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
-gsettings set org.gnome.desktop.interface font-name 'Inter 9.5' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface font-name 'Inter 10.5' 2>/dev/null || true
 
 # 3. Ensure Wallpaper stays locked to Win11 Dark Green (Made by Muheeb)
 if [ -f "$WALL_DARK" ]; then

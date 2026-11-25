@@ -93,8 +93,8 @@ def configure_permanent_persistence(install_dir):
                 "gtk-theme-name=Win11-Muheeb-Green-Dark\n"
                 "gtk-icon-theme-name=Win11-green-dark\n"
                 "gtk-cursor-theme-name=Win11-Cursors-Dark\n"
-                "gtk-cursor-theme-size=24\n"
-                "gtk-font-name=Inter 9.5\n"
+                "gtk-cursor-theme-size=28\n"
+                "gtk-font-name=Inter 10.5\n"
                 "gtk-application-prefer-dark-theme=1\n"
                 "gtk-decoration-layout=icon:minimize,maximize,close\n"
             )
@@ -196,31 +196,32 @@ def main():
 
     configure_permanent_persistence(install_dir)
 
-    # 1. Exact Original Windows 11 Proportions: 96 DPI, Inter 9.5pt, 24px Cursor
+    # 1. Windows 11 Recommended 125% Laptop Scale: 120 DPI, Inter 10.5pt, 28px Cursor
     xfset("xsettings", "/Net/ThemeName", "string", "Win11-Muheeb-Green-Dark")
     xfset("xsettings", "/Net/IconThemeName", "string", "Win11-green-dark")
     xfset("xsettings", "/Gtk/CursorThemeName", "string", "Win11-Cursors-Dark")
-    xfset("xsettings", "/Gtk/CursorThemeSize", "int", "24")
-    xfset("xsettings", "/Gtk/FontName", "string", "Inter 9.5")
+    xfset("xsettings", "/Gtk/CursorThemeSize", "int", "28")
+    xfset("xsettings", "/Gtk/FontName", "string", "Inter 10.5")
     xfset("xsettings", "/Gtk/DecorationLayout", "string", "icon:minimize,maximize,close")
-    xfset("xsettings", "/Xft/DPI", "int", "96")
+    xfset("xsettings", "/Xft/DPI", "int", "120")
 
     sh("gsettings set org.gnome.desktop.interface gtk-theme 'Win11-Muheeb-Green-Dark'")
     sh("gsettings set org.gnome.desktop.interface icon-theme 'Win11-green-dark'")
     sh("gsettings set org.gnome.desktop.interface cursor-theme 'Win11-Cursors-Dark'")
+    sh("gsettings set org.gnome.desktop.interface cursor-size 28")
     sh("gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'")
-    sh("gsettings set org.gnome.desktop.interface font-name 'Inter 9.5'")
+    sh("gsettings set org.gnome.desktop.interface font-name 'Inter 10.5'")
 
     xfset("xfwm4", "/general/theme", "string", "Win11-Muheeb-Green-Dark")
     xfset("xfwm4", "/general/button_layout", "string", "O|HMC")
     xfset("xfwm4", "/general/title_alignment", "string", "left")
-    xfset("xfwm4", "/general/title_font", "string", "Inter Semi-Bold 9")
+    xfset("xfwm4", "/general/title_font", "string", "Inter Semi-Bold 10")
     xfset("xfwm4", "/general/use_compositing", "bool", "true")
     xfset("xfwm4", "/general/show_popup_shadow", "bool", "false")
     xfset("xfwm4", "/general/show_dock_shadow", "bool", "false")
-    xfset("xfwm4", "/general/tile_on_move", "bool", "true")  # Drag window to screen edge to snap!
+    xfset("xfwm4", "/general/tile_on_move", "bool", "true")
 
-    # 2. Wallpaper & Original Windows 11 Desktop Icon Size (42px icons, 9pt label)
+    # 2. Wallpaper & 125% Windows 11 Desktop Icon Size (52px icons, 10pt label)
     for p in subprocess.run(["xfconf-query", "-c", "xfce4-desktop", "-l"], capture_output=True, text=True).stdout.splitlines():
         if p.endswith("/last-image") or p.endswith("/image-path"):
             xfset("xfce4-desktop", p, "string", wall_dark)
@@ -229,14 +230,15 @@ def main():
 
     xfset("xfce4-desktop", "/backdrop/screen0/monitoreDP-1/workspace0/last-image", "string", wall_dark)
     xfset("xfce4-desktop", "/backdrop/screen0/monitoreDP-1/workspace0/image-style", "int", "5")
-    xfset("xfce4-desktop", "/desktop-icons/icon-size", "int", "42")
-    xfset("xfce4-desktop", "/desktop-icons/font-size", "double", "9.0")
+    xfset("xfce4-desktop", "/desktop-icons/icon-size", "int", "52")
+    xfset("xfce4-desktop", "/desktop-icons/font-size", "double", "10.0")
     xfset("xfce4-desktop", "/desktop-icons/use-custom-font-size", "bool", "true")
 
-    # 3. Thunar File Explorer
+    # 3. Thunar File Explorer (125% Scale & Spacious Sidebar)
     xfset("thunar", "/last-location-bar", "string", "ThunarLocationEntry")
     xfset("thunar", "/last-side-pane", "string", "THUNAR_SIDEPANE_TYPE_SHORTCUTS")
-    xfset("thunar", "/last-separator-position", "int", "225")
+    xfset("thunar", "/last-separator-position", "int", "250")
+    xfset("thunar", "/last-icon-view-zoom-level", "string", "THUNAR_ZOOM_LEVEL_100_PERCENT")
     xfset("thunar", "/last-statusbar-visible", "bool", "true")
     xfset("thunar", "/last-menubar-visible", "bool", "false")
     xfset("thunar", "/misc-symbolic-icons-in-toolbar", "bool", "true")
@@ -266,6 +268,7 @@ def main():
     sh("xfce4-panel -q")
 
     create_genmon(200, f"python3 '{pill_py}' widgets", 10000)
+    create_genmon(219, f"python3 '{pill_py}' spacer", 3600000)  # Left-Right width balance for dead-center icons!
     create_separator(201, expand=True)
 
     create_launcher(
@@ -346,20 +349,20 @@ def main():
     xfreset("xfce4-panel", "/plugins/plugin-214")
     xfset("xfce4-panel", "/plugins/plugin-214", "string", "showdesktop")
 
-    plugin_order = [200, 201, 220, 202, 203, 204, 205, 206, 207, 208, 209, 215, 210, 211, 212, 213, 214]
+    plugin_order = [200, 219, 201, 220, 202, 203, 204, 205, 206, 207, 208, 209, 215, 210, 211, 212, 213, 214]
     subprocess.run(
         ["xfconf-query", "-c", "xfce4-panel", "-p", "/panels", "-n", "-a", "-t", "int", "-s", "1"],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
     xfset("xfce4-panel", "/panels/dark-mode", "bool", "true")
-    xfset("xfce4-panel", "/panels/panel-1/position", "string", "p=8;x=960;y=1056")
+    xfset("xfce4-panel", "/panels/panel-1/position", "string", "p=8;x=960;y=1052")
     xfset("xfce4-panel", "/panels/panel-1/length", "double", "100")
-    xfset("xfce4-panel", "/panels/panel-1/length-adjust", "bool", "true")
+    xfset("xfce4-panel", "/panels/panel-1/length-adjust", "bool", "false")
     xfset("xfce4-panel", "/panels/panel-1/mode", "int", "0")
     xfset("xfce4-panel", "/panels/panel-1/nrows", "int", "1")
-    xfset("xfce4-panel", "/panels/panel-1/size", "int", "48")
-    xfset("xfce4-panel", "/panels/panel-1/icon-size", "int", "22")
+    xfset("xfce4-panel", "/panels/panel-1/size", "int", "56")
+    xfset("xfce4-panel", "/panels/panel-1/icon-size", "int", "28")
     xfset("xfce4-panel", "/panels/panel-1/autohide-behavior", "int", "0")
     xfset("xfce4-panel", "/panels/panel-1/position-locked", "bool", "true")
     xfset("xfce4-panel", "/panels/panel-1/background-style", "int", "0")
@@ -372,12 +375,12 @@ def main():
         cmd.extend(["-t", "int", "-s", str(pid)])
     subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
 
-    # Pre-warm Cairo taskbar PNGs before starting panel so there is zero first-frame delay
-    for kind in ("widgets", "search", "lang", "control", "clock"):
+    # Pre-warm Cairo taskbar PNGs before starting panel
+    for kind in ("widgets", "spacer", "search", "lang", "control", "clock"):
         sh(f"python3 '{pill_py}' {kind}")
 
     subprocess.Popen(
-        "xfce4-panel -r >/dev/null 2>&1 || xfce4-panel >/dev/null 2>&1 &",
+        "nohup xfce4-panel --disable-wm-check >/dev/null 2>&1 &",
         shell=True,
         start_new_session=True,
     )

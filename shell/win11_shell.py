@@ -52,7 +52,7 @@ SETTINGS_PATH = os.path.expanduser("~/.config/win11-muheeb/settings.json")
 SHELL_CSS = b"""
 * {
     font-family: "Inter", "Segoe UI", "Noto Sans", sans-serif;
-    font-size: 9.5pt;
+    font-size: 10.5pt;
     outline: none;
 }
 window.win11-flyout {
@@ -60,24 +60,24 @@ window.win11-flyout {
 }
 .mica-card {
     background-color: rgba(15, 24, 20, 0.97);
-    border: 1px solid rgba(52, 211, 153, 0.24);
-    border-radius: 10px;
+    border: 1px solid rgba(52, 211, 153, 0.25);
+    border-radius: 12px;
     color: #ECFDF5;
 }
 .mica-footer {
     background-color: rgba(10, 16, 13, 0.97);
-    border-top: 1px solid rgba(52, 211, 153, 0.15);
-    border-bottom-left-radius: 10px;
-    border-bottom-right-radius: 10px;
+    border-top: 1px solid rgba(52, 211, 153, 0.16);
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
 }
 .search-pill {
     background-color: rgba(25, 40, 33, 0.96);
-    border: 1px solid rgba(52, 211, 153, 0.28);
+    border: 1px solid rgba(52, 211, 153, 0.30);
     border-bottom: 2px solid #10B981;
-    border-radius: 18px;
-    padding: 5px 14px;
+    border-radius: 20px;
+    padding: 7px 16px;
     color: #ECFDF5;
-    font-size: 10pt;
+    font-size: 10.8pt;
     caret-color: #34D399;
 }
 .search-pill:focus {
@@ -89,56 +89,56 @@ window.win11-flyout {
     border: 1px solid rgba(52, 211, 153, 0.28);
     border-bottom: 2px solid #10B981;
     border-radius: 6px;
-    padding: 5px 10px;
+    padding: 6px 12px;
     color: #ECFDF5;
 }
 .section-title {
-    font-size: 10pt;
+    font-size: 11pt;
     font-weight: 700;
     color: #ECFDF5;
 }
 .muted-label {
-    font-size: 8.8pt;
+    font-size: 9.5pt;
     color: #9EB3A8;
 }
 .muheeb-badge {
-    background-color: rgba(5, 150, 105, 0.24);
-    border: 1px solid rgba(52, 211, 153, 0.42);
+    background-color: rgba(5, 150, 105, 0.25);
+    border: 1px solid rgba(52, 211, 153, 0.44);
     border-radius: 99px;
-    padding: 2px 9px;
+    padding: 3px 11px;
     color: #34D399;
-    font-size: 8.5pt;
+    font-size: 9.2pt;
     font-weight: 700;
 }
 .pill-btn {
     background-color: rgba(32, 49, 41, 0.88);
-    border: 1px solid rgba(52, 211, 153, 0.18);
+    border: 1px solid rgba(52, 211, 153, 0.20);
     border-radius: 6px;
-    padding: 4px 10px;
+    padding: 6px 12px;
     color: #D1FAE5;
-    font-size: 9pt;
+    font-size: 9.8pt;
     font-weight: 600;
 }
 .pill-btn:hover {
-    background-color: rgba(16, 185, 129, 0.24);
-    border-color: rgba(52, 211, 153, 0.42);
+    background-color: rgba(16, 185, 129, 0.25);
+    border-color: rgba(52, 211, 153, 0.44);
 }
 .tab-active {
     background-color: #059669;
     border: 1px solid #34D399;
-    border-radius: 14px;
-    padding: 3px 12px;
+    border-radius: 16px;
+    padding: 4px 14px;
     color: #FFFFFF;
-    font-size: 9pt;
+    font-size: 9.8pt;
     font-weight: 700;
 }
 .tab-inactive {
     background-color: rgba(28, 44, 36, 0.85);
     border: 1px solid rgba(52, 211, 153, 0.16);
-    border-radius: 14px;
-    padding: 3px 12px;
+    border-radius: 16px;
+    padding: 4px 14px;
     color: #CFE3D9;
-    font-size: 9pt;
+    font-size: 9.8pt;
 }
 .tab-inactive:hover {
     background-color: rgba(52, 211, 153, 0.15);
@@ -147,9 +147,9 @@ window.win11-flyout {
     background-color: #059669;
     border: 1px solid #10B981;
     border-radius: 6px;
-    padding: 5px 13px;
+    padding: 6px 15px;
     color: #FFFFFF;
-    font-size: 9.2pt;
+    font-size: 10pt;
     font-weight: 700;
 }
 .accent-btn:hover {
@@ -158,42 +158,42 @@ window.win11-flyout {
 .app-tile {
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 7px 4px;
+    border-radius: 8px;
+    padding: 9px 6px;
     color: #ECFDF5;
 }
 .app-tile:hover {
     background-color: rgba(52, 211, 153, 0.12);
-    border-color: rgba(52, 211, 153, 0.20);
+    border-color: rgba(52, 211, 153, 0.22);
 }
 .rec-row {
     background: transparent;
     border: 1px solid transparent;
-    border-radius: 6px;
-    padding: 6px 9px;
+    border-radius: 7px;
+    padding: 7px 10px;
     color: #ECFDF5;
 }
 .rec-row:hover {
-    background-color: rgba(52, 211, 153, 0.11);
-    border-color: rgba(52, 211, 153, 0.18);
+    background-color: rgba(52, 211, 153, 0.12);
+    border-color: rgba(52, 211, 153, 0.20);
 }
 .qs-tile {
     background-color: rgba(29, 45, 37, 0.92);
     border: 1px solid rgba(52, 211, 153, 0.18);
-    border-radius: 6px;
-    min-height: 44px;
+    border-radius: 8px;
+    min-height: 50px;
     color: #ECFDF5;
     font-weight: 600;
 }
 .qs-tile:hover {
     background-color: rgba(41, 62, 52, 0.96);
-    border-color: rgba(52, 211, 153, 0.35);
+    border-color: rgba(52, 211, 153, 0.36);
 }
 .qs-tile-active {
     background-color: #059669;
     border: 1px solid #34D399;
-    border-radius: 6px;
-    min-height: 44px;
+    border-radius: 8px;
+    min-height: 50px;
     color: #FFFFFF;
     font-weight: 700;
 }
@@ -208,28 +208,28 @@ window.win11-flyout {
 .qs-split-right {
     border-top-left-radius: 0;
     border-bottom-left-radius: 0;
-    min-width: 32px;
-    padding: 0 6px;
+    min-width: 36px;
+    padding: 0 8px;
 }
 .qs-caption {
-    font-size: 8.5pt;
+    font-size: 9.2pt;
     color: #CBDBD3;
 }
 .notif-item, .widget-subcard {
     background-color: rgba(24, 38, 31, 0.92);
     border: 1px solid rgba(52, 211, 153, 0.18);
-    border-radius: 8px;
-    padding: 10px 12px;
+    border-radius: 9px;
+    padding: 12px 14px;
 }
 .cal-day {
     background: transparent;
     border: none;
-    border-radius: 17px;
-    min-width: 32px;
-    min-height: 32px;
+    border-radius: 19px;
+    min-width: 36px;
+    min-height: 36px;
     padding: 0;
     color: #E2F1EA;
-    font-size: 9pt;
+    font-size: 9.8pt;
 }
 .cal-day:hover {
     background-color: rgba(52, 211, 153, 0.16);
@@ -237,41 +237,41 @@ window.win11-flyout {
 .cal-today {
     background-color: #059669;
     border: 1px solid #34D399;
-    border-radius: 17px;
-    min-width: 32px;
-    min-height: 32px;
+    border-radius: 19px;
+    min-width: 36px;
+    min-height: 36px;
     padding: 0;
     color: #FFFFFF;
     font-weight: 700;
-    font-size: 9pt;
+    font-size: 9.8pt;
 }
 scale trough {
     background-color: rgba(45, 68, 57, 0.95);
     border-radius: 99px;
-    min-height: 4px;
+    min-height: 5px;
 }
 scale highlight {
     background-color: #10B981;
     border-radius: 99px;
-    min-height: 4px;
+    min-height: 5px;
 }
 scale slider {
     background-color: #34D399;
     border: 3px solid #12211A;
     border-radius: 99px;
-    min-width: 16px;
-    min-height: 16px;
-    margin: -6px 0;
+    min-width: 19px;
+    min-height: 19px;
+    margin: -7px 0;
 }
 progressbar trough {
     background-color: rgba(40, 62, 51, 0.9);
     border-radius: 99px;
-    min-height: 6px;
+    min-height: 7px;
 }
 progressbar progress {
     background-color: #10B981;
     border-radius: 99px;
-    min-height: 6px;
+    min-height: 7px;
 }
 """
 
@@ -515,8 +515,8 @@ class BaseFlyout(Gtk.Window):
             self.set_visual(visual)
 
         mx, my, mw, mh = get_primary_geometry()
-        panel_h = 48
-        gap = 12
+        panel_h = 56
+        gap = 14
         if align == "center":
             x = mx + (mw - width) // 2
             y = my + mh - panel_h - height - gap
@@ -557,6 +557,8 @@ class BaseFlyout(Gtk.Window):
         return False
 
     def _on_focus_out(self, widget, event):
+        if getattr(self, "_keep_open", False):
+            return False
         if time.monotonic() - self._created_at < 0.35:
             return False
         GLib.timeout_add(90, self._check_focus_and_close)
@@ -582,7 +584,7 @@ class BaseFlyout(Gtk.Window):
 # ==============================================================================
 class StartMenuFlyout(BaseFlyout):
     def __init__(self, repo_root):
-        super().__init__(620, 640, align="center")
+        super().__init__(710, 700, align="center")
         self.repo_root = repo_root
         self.all_apps = get_all_apps()
 
@@ -725,13 +727,13 @@ class StartMenuFlyout(BaseFlyout):
             btn.get_style_context().add_class("app-tile")
             vb = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
             vb.set_halign(Gtk.Align.CENTER)
-            pb = find_icon_pixbuf(ic_list, 28)
+            pb = find_icon_pixbuf(ic_list, 34)
             if pb:
                 vb.pack_start(Gtk.Image.new_from_pixbuf(pb), False, False, 0)
             tl = Gtk.Label(label=title)
-            tl.set_max_width_chars(12)
+            tl.set_max_width_chars(13)
             tl.set_ellipsize(Pango.EllipsizeMode.END)
-            tl.set_markup(f"<span size='8800'>{GLib.markup_escape_text(title)}</span>")
+            tl.set_markup(f"<span size='9800'>{GLib.markup_escape_text(title)}</span>")
             vb.pack_start(tl, False, False, 0)
             btn.add(vb)
             btn.connect("clicked", lambda _, c=cmd: (spawn_detached(c), self.close_flyout()))
@@ -851,7 +853,7 @@ class StartMenuFlyout(BaseFlyout):
 # ==============================================================================
 class CustomizableSearchFlyout(BaseFlyout):
     def __init__(self):
-        super().__init__(660, 610, align="center")
+        super().__init__(740, 660, align="center")
         self.cfg = load_user_settings()
         self.all_apps = get_all_apps()
         self.active_tab = "all"
@@ -1188,7 +1190,7 @@ class CustomizableSearchFlyout(BaseFlyout):
 # ==============================================================================
 class ControlCenterFlyout(BaseFlyout):
     def __init__(self):
-        super().__init__(380, 480, align="right")
+        super().__init__(428, 530, align="right")
 
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         card.get_style_context().add_class("mica-card")
@@ -1729,18 +1731,18 @@ class ControlCenterFlyout(BaseFlyout):
 # ==============================================================================
 class NotificationCalendarFlyout(BaseFlyout):
     def __init__(self):
-        super().__init__(364, 636, align="right")
+        super().__init__(408, 690, align="right")
         today = datetime.date.today()
         self.shown_year = today.year
         self.shown_month = today.month
         self.focus_mins = 30
 
-        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=10)
+        outer = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
         self.add(outer)
 
         ncard = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         ncard.get_style_context().add_class("mica-card")
-        ncard.set_size_request(-1, 246)
+        ncard.set_size_request(-1, 260)
         n_in = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         n_in.set_margin_top(14)
         n_in.set_margin_bottom(12)
@@ -1768,7 +1770,7 @@ class NotificationCalendarFlyout(BaseFlyout):
 
         ccard = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         ccard.get_style_context().add_class("mica-card")
-        ccard.set_size_request(-1, 378)
+        ccard.set_size_request(-1, 418)
         c_in = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
         c_in.set_margin_top(14)
         c_in.set_margin_start(16)
@@ -2176,10 +2178,10 @@ class WidgetsFlyout(BaseFlyout):
 
 
 class SettingsDialog(BaseFlyout):
-    """Windows 11 Settings (Win+I): Wallpaper, Taskbar Search Style, Wi-Fi/BT & System."""
+    """Windows 11 Settings (Win+I): Scale (125%), Wallpaper, Search Style, Wi-Fi/BT."""
 
     def __init__(self, repo_root):
-        super().__init__(560, 440, align="dialog", close_on_blur=False)
+        super().__init__(640, 530, align="dialog", close_on_blur=False)
         self.repo_root = repo_root
         self.cfg = load_user_settings()
 
@@ -2195,14 +2197,31 @@ class SettingsDialog(BaseFlyout):
         card.pack_start(body, True, True, 0)
 
         hdr = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=10)
-        hdr.pack_start(make_win11_logo_drawing(28), False, False, 0)
-        tl = Gtk.Label(label="Windows 11 Settings & Personalization", xalign=0)
+        hdr.pack_start(make_win11_logo_drawing(30), False, False, 0)
+        tl = Gtk.Label(label="Windows 11 Settings & Display Scale", xalign=0)
         tl.get_style_context().add_class("section-title")
         hdr.pack_start(tl, True, True, 0)
         mb = Gtk.Label(label=BRAND_AUTHOR)
         mb.get_style_context().add_class("muheeb-badge")
         hdr.pack_end(mb, False, False, 0)
         body.pack_start(hdr, False, False, 0)
+
+        # Display Scale Selector (100% | 125% Recommended | 150%)
+        dcard = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
+        dcard.get_style_context().add_class("widget-subcard")
+        dt = Gtk.Label(label="Display Scale & Layout", xalign=0)
+        dt.get_style_context().add_class("section-title")
+        dcard.pack_start(dt, False, False, 0)
+        drow = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        cur_scale = int(self.cfg.get("scale_pct", 125))
+        for pct, slbl in [(100, "100%"), (125, "125% (Recommended)"), (150, "150%")]:
+            db = Gtk.Button(label=slbl)
+            db._pct = pct
+            db.get_style_context().add_class("accent-btn" if cur_scale == pct else "pill-btn")
+            db.connect("clicked", self._set_scale, pct, drow)
+            drow.pack_start(db, True, True, 0)
+        dcard.pack_start(drow, False, False, 0)
+        body.pack_start(dcard, False, False, 0)
 
         # Wallpaper Switcher
         wcard = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=8)
@@ -2239,7 +2258,7 @@ class SettingsDialog(BaseFlyout):
         me = os.path.abspath(__file__)
         for lbl, cmd in [
             ("📶 Wi-Fi & Bluetooth", f"python3 '{me}' control"),
-            ("🔍 Search Settings", f"python3 '{me}' search"),
+            ("🌐 Muheebbinnadeem.cv", "xdg-open 'https://muheebbinnadeem.cv'"),
             ("🖥️ XFCE Settings", "xfce4-settings-manager"),
         ]:
             b = Gtk.Button(label=lbl)
@@ -2254,6 +2273,17 @@ class SettingsDialog(BaseFlyout):
         close_b.connect("clicked", lambda *_: self.close_flyout())
         body.pack_end(close_b, False, False, 0)
 
+    def _set_scale(self, _, pct, container):
+        self.cfg["scale_pct"] = pct
+        save_user_settings(self.cfg)
+        dpi = max(96, min(168, int(round(96 * pct / 100.0))))
+        run_cmd(f"xfconf-query -c xsettings -p /Xft/DPI -n -t int -s {dpi}")
+        for ch in container.get_children():
+            ctx = ch.get_style_context()
+            ctx.remove_class("accent-btn")
+            ctx.remove_class("pill-btn")
+            ctx.add_class("accent-btn" if getattr(ch, "_pct", 0) == pct else "pill-btn")
+
     def _set_wallpaper(self, _, fname):
         wpath = os.path.join(self.repo_root, "wallpapers", fname)
         for prop in run_cmd("xfconf-query -c xfce4-desktop -l").splitlines():
@@ -2267,7 +2297,7 @@ class SettingsDialog(BaseFlyout):
 
 class WinverDialog(BaseFlyout):
     def __init__(self, repo_root):
-        super().__init__(460, 360, align="dialog", close_on_blur=False)
+        super().__init__(540, 430, align="dialog", close_on_blur=False)
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=12)
         card.get_style_context().add_class("mica-card")
         self.add(card)
@@ -2281,9 +2311,9 @@ class WinverDialog(BaseFlyout):
 
         lh = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=12)
         lh.set_halign(Gtk.Align.CENTER)
-        lh.pack_start(make_win11_logo_drawing(38), False, False, 0)
+        lh.pack_start(make_win11_logo_drawing(40), False, False, 0)
         lt = Gtk.Label()
-        lt.set_markup("<span size='20000' weight='700' color='#ECFDF5'>Windows 11</span>")
+        lt.set_markup("<span size='21000' weight='700' color='#ECFDF5'>Windows 11</span>")
         lh.pack_start(lt, False, False, 0)
         body.pack_start(lh, False, False, 4)
 
@@ -2292,24 +2322,39 @@ class WinverDialog(BaseFlyout):
         info = Gtk.Label(xalign=0)
         info.set_line_wrap(True)
         info.set_markup(
-            f"<span weight='700' size='11000' color='#34D399'>{BRAND_EDITION}</span>\n"
-            f"Version 24H2 (OS Build 26100.Muheeb • Kali GNU/Linux Rolling)\n\n"
-            f"Designed &amp; Engineered by: <b>{BRAND_AUTHOR}</b>\n"
-            "Original 96-DPI Windows 11 Proportions • In-Panel Wi-Fi &amp; Bluetooth •\n"
-            "Customizable Search Bar • Snipping Tool (Win+Shift+S) • Full Win11 Shortcuts."
+            f"<span weight='700' size='11500' color='#34D399'>{BRAND_EDITION}</span>\n"
+            f"Version 24H2 • 125% Display Scale (Kali GNU/Linux Rolling)\n\n"
+            f"Author: <b>{BRAND_AUTHOR}</b>  •  Portfolio: <b>Muheebbinnadeem.cv</b>\n"
+            "💖 Support Project:\n"
+            "  • <b>Askari Bank Limited</b>: <tt>02110200000209</tt>\n"
+            "  • <b>WhatsApp</b>: <tt>0307 4171882</tt>"
         )
         body.pack_start(info, True, True, 0)
 
+        brow = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=8)
+        web_b = Gtk.Button(label="🌐 Muheebbinnadeem.cv")
+        web_b.get_style_context().add_class("pill-btn")
+        web_b.connect("clicked", lambda *_: spawn_detached("xdg-open 'https://muheebbinnadeem.cv'"))
+        brow.pack_start(web_b, False, False, 0)
+
+        wa_b = Gtk.Button(label="💬 WhatsApp")
+        wa_b.get_style_context().add_class("pill-btn")
+        wa_b.connect("clicked", lambda *_: spawn_detached("xdg-open 'https://wa.me/923074171882'"))
+        brow.pack_start(wa_b, False, False, 0)
+
+        brow.pack_start(Gtk.Box(), True, True, 0)
+
         ok_b = Gtk.Button(label="OK")
-        ok_b.set_size_request(92, 32)
-        ok_b.set_halign(Gtk.Align.END)
+        ok_b.set_size_request(96, 36)
         ok_b.get_style_context().add_class("accent-btn")
         ok_b.connect("clicked", lambda *_: self.close_flyout())
-        body.pack_end(ok_b, False, False, 0)
+        brow.pack_end(ok_b, False, False, 0)
+        body.pack_end(brow, False, False, 0)
 
 
 def main():
     mode = sys.argv[1] if len(sys.argv) > 1 else "start"
+    keep_open = "--keep-open" in sys.argv
     if mode == "snip-full":
         take_snip("fullscreen")
         return
@@ -2345,6 +2390,9 @@ def main():
         win = WinverDialog(repo_root)
     else:
         win = StartMenuFlyout(repo_root)
+
+    if keep_open:
+        win._keep_open = True
 
     signal.signal(signal.SIGTERM, lambda *_: (cleanup_state(), Gtk.main_quit()))
     win.show_flyout()
