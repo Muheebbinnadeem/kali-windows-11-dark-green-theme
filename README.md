@@ -15,7 +15,7 @@
 
 <br/>
 
-<img src="wallpapers/win11-muheeb-dark.png" alt="Windows 11 Dark Green Wallpaper for Kali Linux — Made by Muheeb" width="100%"/>
+<img src="assets/screenshots/desktop-clean-125.png" alt="Windows 11 Dark Green Live Desktop Preview on Kali Linux — Made by Muheeb" width="100%"/>
 
 </div>
 
