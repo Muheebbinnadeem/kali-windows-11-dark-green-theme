@@ -139,5 +139,5 @@ If you like this **Windows 11 Dark Green Kali Linux Theme** and want to support 
 ---
 
 <div align="center">
-  <b>Designed &amp; Built with ❤️ by <a href="https://muheebbinnadeem.cv">Muheeb Bin Nadeem</a> (<code>Made by Muheeb</code>)</b>
+  <b>Designed &amp; Built by <a href="https://muheebbinnadeem.cv">Muheeb Bin Nadeem</a> (<code>Made by Muheeb</code>)</b>
 </div>
