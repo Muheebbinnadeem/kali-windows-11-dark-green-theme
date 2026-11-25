@@ -10,6 +10,14 @@ BACKUP_DIR="$INSTALL_DIR/backup"
 
 echo "[*] Restoring original Kali Linux XFCE desktop configuration..."
 
+# Remove Win11 autostart overrides so original Kali applets return cleanly
+rm -f "$HOME/.config/autostart/win11-muheeb-session.desktop" \
+      "$HOME/.config/autostart/nm-applet.desktop" \
+      "$HOME/.config/autostart/blueman.desktop" \
+      "$HOME/.config/gtk-3.0/settings.ini" \
+      "$HOME/.config/gtk-4.0/settings.ini" \
+      "$HOME/.icons/default/index.theme"
+
 if [ -d "$BACKUP_DIR/xfce4-xfconf" ]; then
     xfce4-panel -q >/dev/null 2>&1 || true
     killall xfconfd >/dev/null 2>&1 || true
@@ -39,6 +47,7 @@ done
 
 if [ -n "${DISPLAY:-}" ]; then
     nohup xfce4-panel >/dev/null 2>&1 &
+    nohup nm-applet >/dev/null 2>&1 &
     xfdesktop --reload >/dev/null 2>&1 || true
     thunar -q >/dev/null 2>&1 || true
 fi

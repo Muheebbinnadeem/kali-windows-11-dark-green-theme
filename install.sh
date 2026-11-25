@@ -21,7 +21,7 @@ echo -e "${EMERALD}=============================================================
 
 # 1. Check / Install minimal required packages if missing on a fresh Kali install
 MISSING_PKGS=()
-for cmd_pkg in "xfconf-query:xfce4-settings" "python3:python3" "rofi:rofi" "notify-send:libnotify-bin"; do
+for cmd_pkg in "xfconf-query:xfce4-settings" "python3:python3" "rofi:rofi" "notify-send:libnotify-bin" "xcape:xcape" "xclip:xclip"; do
     cmd="${cmd_pkg%%:*}"
     pkg="${cmd_pkg##*:}"
     if ! command -v "$cmd" >/dev/null 2>&1; then

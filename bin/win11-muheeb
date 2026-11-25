@@ -8,7 +8,7 @@ case "${1:-help}" in
     apply)
         python3 "$INSTALL_DIR/bin/configure_xfce_win11.py"
         ;;
-    start|search|control|notifications|widgets|winver)
+    start|search|control|notifications|widgets|snip|snip-full|run|winx|settings|winver)
         exec python3 "$SHELL_PY" "$1"
         ;;
     about)
