@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 """
-Native Windows 11 Pro Taskbar Engine — 125% Display Scale Edition (Made by Muheeb)
+Native Windows 11 Pro Taskbar Engine — 125%+ Display Scale Edition (Made by Muheeb)
 Built with GTK3 + Wnck 3.0 + Cairo + X11 Non-Focusing Dock Struts.
 
-Key Engineering Guarantees:
-  - set_accept_focus(False) & set_focus_on_map(False): clicking taskbar NEVER steals focus
-    from active apps or open flyouts — so clicking an open app minimizes/restores cleanly,
-    and clicking Start / Search / Quick Settings / Clock toggles open & closed 100% reliably!
-  - True 125% Windows 11 Proportions: 56px taskbar height, 28px crisp app icons, 48x44px slots,
-    13px crisp tray text, 18px monochrome Fluent tray icons, subtle press-bounce animation.
-  - Zero '⋮⋮' handles, flush 0..1920px width, merged Pinned + Running apps, upward '⌃' chevron.
+Fixes & Features:
+  - HoverCanvas inherits directly from Gtk.DrawingArea (no EventBox child-window occlusion!)
+    so 100% of left-clicks, right-clicks, hover states, and mousewheel events fire reliably.
+  - set_accept_focus(False) & set_focus_on_map(False): clicking taskbar never steals focus
+    from open apps or flyouts.
+  - True 125%+ Laptop Scale: 60px taskbar height, 32px crisp icons, 52x48px slots,
+    14.5px tray typography, 20px monochrome Fluent tray icons, upward '⌃' chevron.
 """
 import datetime
 import json
@@ -33,11 +33,11 @@ try:
 except ImportError:
     psutil = None
 
-# 125% Windows 11 Taskbar Metrics (45px * 1.25 = 56px, 24px * 1.2 = 28px icons)
-BAR_HEIGHT = 56
-SLOT_W = 48
-SLOT_H = 46
-ICON_PX = 28
+# Spacious 125%+ Windows 11 Taskbar Metrics for 1080p Laptop Displays
+BAR_HEIGHT = 60
+SLOT_W = 52
+SLOT_H = 48
+ICON_PX = 30
 
 SETTINGS_PATH = os.path.expanduser("~/.config/win11-muheeb/settings.json")
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -54,18 +54,18 @@ window.win11-dock {
 }
 menu {
     background-color: #14221C;
-    border: 1px solid rgba(52, 211, 153, 0.30);
+    border: 1px solid rgba(52, 211, 153, 0.32);
     border-radius: 8px;
     padding: 6px;
     color: #ECFDF5;
-    font-size: 10.5pt;
+    font-size: 11pt;
 }
 menuitem {
     border-radius: 5px;
-    padding: 7px 14px;
+    padding: 8px 14px;
 }
 menuitem:hover {
-    background-color: rgba(16, 185, 129, 0.26);
+    background-color: rgba(16, 185, 129, 0.28);
     color: #FFFFFF;
 }
 """
@@ -141,10 +141,11 @@ def load_scaled_pixbuf(candidates, size=ICON_PX):
         return None
 
 
-class HoverCanvas(Gtk.EventBox):
+class HoverCanvas(Gtk.DrawingArea):
+    """Direct Gtk.DrawingArea subclass — receives all X11 pointer & scroll events directly."""
+
     def __init__(self, width, height, tooltip="", on_click=None, on_right_click=None, on_scroll=None):
         super().__init__()
-        self.set_visible_window(False)
         self.set_can_focus(False)
         self.set_size_request(width, height)
         self.hovered = False
@@ -154,12 +155,6 @@ class HoverCanvas(Gtk.EventBox):
         if tooltip:
             self.set_tooltip_text(tooltip)
 
-        self.area = Gtk.DrawingArea()
-        self.area.set_can_focus(False)
-        self.area.set_size_request(width, height)
-        self.area.connect("draw", self._draw_wrapper)
-        self.add(self.area)
-
         self.add_events(
             Gdk.EventMask.ENTER_NOTIFY_MASK
             | Gdk.EventMask.LEAVE_NOTIFY_MASK
@@ -167,6 +162,7 @@ class HoverCanvas(Gtk.EventBox):
             | Gdk.EventMask.BUTTON_RELEASE_MASK
             | Gdk.EventMask.SCROLL_MASK
         )
+        self.connect("draw", self._draw_wrapper)
         self.connect("enter-notify-event", self._on_enter)
         self.connect("leave-notify-event", self._on_leave)
         self.connect("button-press-event", self._on_btn_press)
@@ -176,19 +172,19 @@ class HoverCanvas(Gtk.EventBox):
 
     def _on_enter(self, *_):
         self.hovered = True
-        self.area.queue_draw()
+        self.queue_draw()
         return False
 
     def _on_leave(self, *_):
         self.hovered = False
         self.pressed = False
-        self.area.queue_draw()
+        self.queue_draw()
         return False
 
     def _on_btn_press(self, _, event):
         if event.button == 1:
             self.pressed = True
-            self.area.queue_draw()
+            self.queue_draw()
             return True
         if event.button == 3 and self._on_right_click:
             self._on_right_click(event)
@@ -198,7 +194,7 @@ class HoverCanvas(Gtk.EventBox):
     def _on_btn_release(self, widget, event):
         if event.button == 1 and self.pressed:
             self.pressed = False
-            self.area.queue_draw()
+            self.queue_draw()
             alloc = widget.get_allocation()
             if 0 <= event.x <= alloc.width and 0 <= event.y <= alloc.height:
                 if self._on_click:
@@ -213,17 +209,17 @@ class HoverCanvas(Gtk.EventBox):
             ctx.fill()
         elif self.hovered:
             rounded_rect(ctx, 1, 1, w - 2, h - 2, radius)
-            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.09)
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.095)
             ctx.fill_preserve()
             ctx.set_line_width(1.0)
-            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.08)
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.09)
             ctx.stroke()
         elif active_bg:
             rounded_rect(ctx, 1, 1, w - 2, h - 2, radius)
-            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.07)
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.075)
             ctx.fill_preserve()
             ctx.set_line_width(1.0)
-            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.05)
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.06)
             ctx.stroke()
 
     def _draw_wrapper(self, widget, ctx):
@@ -261,7 +257,7 @@ class AppDockSlot(HoverCanvas):
             self.set_tooltip_text(names[0] if len(names) == 1 else f"{self.title} ({len(windows)} windows)")
         else:
             self.set_tooltip_text(self.title)
-        self.area.queue_draw()
+        self.queue_draw()
 
     def _activate_win(self, w, ts):
         ws = w.get_workspace()
@@ -337,21 +333,21 @@ class AppDockSlot(HoverCanvas):
             ctx.paint()
 
         if self.is_focused:
-            pw, ph = 18.0, 3.5
-            rounded_rect(ctx, (w - pw) / 2.0, h - ph - 1.5, pw, ph, 1.75)
+            pw, ph = 20.0, 3.8
+            rounded_rect(ctx, (w - pw) / 2.0, h - ph - 1.5, pw, ph, 1.9)
             ctx.set_source_rgba(0.20, 0.83, 0.60, 1.0)
             ctx.fill()
         elif self.windows:
-            pw, ph = 7.0, 3.5
-            rounded_rect(ctx, (w - pw) / 2.0, h - ph - 1.5, pw, ph, 1.75)
-            ctx.set_source_rgba(0.74, 0.84, 0.79, 0.80)
+            pw, ph = 8.0, 3.8
+            rounded_rect(ctx, (w - pw) / 2.0, h - ph - 1.5, pw, ph, 1.9)
+            ctx.set_source_rgba(0.74, 0.84, 0.79, 0.82)
             ctx.fill()
 
 
 class WidgetsButton(HoverCanvas):
     def __init__(self):
         super().__init__(
-            144,
+            156,
             SLOT_H,
             tooltip="Widgets Board (Win+W) • Made by Muheeb",
             on_click=lambda *_: spawn(f"python3 '{SHELL_PY}' widgets"),
@@ -361,26 +357,26 @@ class WidgetsButton(HoverCanvas):
         self.draw_hover_bg(ctx, w, h, radius=6.0)
         cy = h / 2.0
 
-        ctx.arc(18, cy - 3.5, 6.4, 0, 2 * math.pi)
+        ctx.arc(20, cy - 3.8, 7.0, 0, 2 * math.pi)
         ctx.set_source_rgba(0.99, 0.80, 0.20, 0.98)
         ctx.fill()
 
-        rounded_rect(ctx, 14.0, cy - 1.2, 20.0, 10.2, 5.1)
+        rounded_rect(ctx, 15.0, cy - 1.2, 22.0, 11.2, 5.6)
         ctx.set_source_rgba(0.93, 0.98, 0.95, 0.98)
         ctx.fill()
-        ctx.arc(21.0, cy - 1.2, 5.5, 0, 2 * math.pi)
+        ctx.arc(23.0, cy - 1.2, 6.0, 0, 2 * math.pi)
         ctx.fill()
 
         ctx.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_BOLD)
-        ctx.set_font_size(13.2)
+        ctx.set_font_size(14.5)
         ctx.set_source_rgba(0.95, 0.99, 0.97, 0.97)
-        ctx.move_to(42, cy - 2.0)
+        ctx.move_to(46, cy - 2.0)
         ctx.show_text("24°C")
 
         ctx.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-        ctx.set_font_size(12.0)
+        ctx.set_font_size(13.0)
         ctx.set_source_rgba(0.20, 0.83, 0.60, 0.96)
-        ctx.move_to(42, cy + 12.5)
+        ctx.move_to(46, cy + 14.0)
         ctx.show_text("Muheeb")
 
 
@@ -400,9 +396,9 @@ class SearchPillWidget(HoverCanvas):
     def _calc_width(self):
         st = self.cfg.get("search_style", "box")
         if st == "box":
-            return 212
+            return 232
         if st == "compact":
-            return 114
+            return 126
         if st == "icon":
             return SLOT_W
         return 0
@@ -413,8 +409,7 @@ class SearchPillWidget(HoverCanvas):
             self.hide()
         else:
             self.set_size_request(w, SLOT_H)
-            self.area.set_size_request(w, SLOT_H)
-            self.show_all()
+            self.show()
 
     def poll_config(self):
         try:
@@ -423,7 +418,7 @@ class SearchPillWidget(HoverCanvas):
                 self._last_mtime = st
                 self.cfg = load_settings()
                 self._sync_visibility()
-                self.area.queue_draw()
+                self.queue_draw()
         except Exception:
             pass
         return True
@@ -436,16 +431,16 @@ class SearchPillWidget(HoverCanvas):
         if style == "icon":
             self.draw_hover_bg(ctx, w, h, radius=6.0)
             ctx.set_source_rgba(0.94, 0.99, 0.96, 0.95)
-            ctx.set_line_width(1.9)
-            ctx.arc(w / 2.0 - 1.8, cy - 1.8, 7.2, 0, 2 * math.pi)
+            ctx.set_line_width(2.0)
+            ctx.arc(w / 2.0 - 2.0, cy - 2.0, 7.8, 0, 2 * math.pi)
             ctx.stroke()
             ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-            ctx.move_to(w / 2.0 + 3.5, cy + 3.5)
-            ctx.line_to(w / 2.0 + 8.8, cy + 8.8)
+            ctx.move_to(w / 2.0 + 3.8, cy + 3.8)
+            ctx.line_to(w / 2.0 + 9.5, cy + 9.5)
             ctx.stroke()
             return
 
-        bh = 37.0
+        bh = 39.0
         by = (h - bh) / 2.0
         rounded_rect(ctx, 2.0, by, w - 4.0, bh, bh / 2.0)
         if self.hovered:
@@ -454,38 +449,38 @@ class SearchPillWidget(HoverCanvas):
             ctx.set_source_rgba(0.14, 0.22, 0.18, 0.96)
         ctx.fill_preserve()
 
-        ctx.set_line_width(1.1)
+        ctx.set_line_width(1.2)
         if self.hovered:
-            ctx.set_source_rgba(0.20, 0.83, 0.60, 0.58)
+            ctx.set_source_rgba(0.20, 0.83, 0.60, 0.60)
         else:
-            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.14)
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.15)
         ctx.stroke()
 
         ctx.set_source_rgba(0.92, 0.98, 0.95, 0.94)
-        ctx.set_line_width(1.75)
-        ctx.arc(21.0, cy - 1.2, 5.8, 0, 2 * math.pi)
+        ctx.set_line_width(1.9)
+        ctx.arc(22.0, cy - 1.2, 6.2, 0, 2 * math.pi)
         ctx.stroke()
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        ctx.move_to(25.3, cy + 3.1)
-        ctx.line_to(29.8, cy + 7.6)
+        ctx.move_to(26.6, cy + 3.4)
+        ctx.line_to(31.4, cy + 8.2)
         ctx.stroke()
 
         ctx.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-        ctx.set_font_size(13.6)
+        ctx.set_font_size(14.8)
         ascent, descent, _, _, _ = ctx.font_extents()
         ctx.set_source_rgba(0.80, 0.88, 0.84, 0.94)
-        ctx.move_to(39.0, (h - ascent - descent) / 2.0 + ascent)
+        ctx.move_to(42.0, (h - ascent - descent) / 2.0 + ascent)
         ctx.show_text(label[:15])
 
         if style == "box" and self.cfg.get("search_gleam", True):
-            gx = w - 22.0
-            ctx.arc(gx, cy, 8.8, 0, 2 * math.pi)
-            ctx.set_source_rgba(0.06, 0.73, 0.51, 0.26)
+            gx = w - 23.0
+            ctx.arc(gx, cy, 9.5, 0, 2 * math.pi)
+            ctx.set_source_rgba(0.06, 0.73, 0.51, 0.28)
             ctx.fill()
-            ctx.arc(gx - 1.8, cy - 1.2, 3.0, 0, 2 * math.pi)
+            ctx.arc(gx - 2.0, cy - 1.3, 3.3, 0, 2 * math.pi)
             ctx.set_source_rgba(0.20, 0.83, 0.60, 0.96)
             ctx.fill()
-            ctx.arc(gx + 2.6, cy + 1.8, 2.0, 0, 2 * math.pi)
+            ctx.arc(gx + 2.8, cy + 2.0, 2.2, 0, 2 * math.pi)
             ctx.set_source_rgba(0.75, 0.98, 0.88, 0.94)
             ctx.fill()
 
@@ -493,7 +488,7 @@ class SearchPillWidget(HoverCanvas):
 class ChevronTrayButton(HoverCanvas):
     def __init__(self):
         super().__init__(
-            32,
+            34,
             SLOT_H,
             tooltip="Show quick system tools",
             on_click=self._open_menu,
@@ -520,19 +515,19 @@ class ChevronTrayButton(HoverCanvas):
         self.draw_hover_bg(ctx, w, h, radius=6.0)
         cx, cy = w / 2.0, h / 2.0
         ctx.set_source_rgba(0.93, 0.98, 0.95, 0.92)
-        ctx.set_line_width(1.75)
+        ctx.set_line_width(1.9)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
         ctx.set_line_join(cairo.LINE_JOIN_ROUND)
-        ctx.move_to(cx - 5.2, cy + 2.4)
-        ctx.line_to(cx, cy - 2.8)
-        ctx.line_to(cx + 5.2, cy + 2.4)
+        ctx.move_to(cx - 5.6, cy + 2.6)
+        ctx.line_to(cx, cy - 3.0)
+        ctx.line_to(cx + 5.6, cy + 2.6)
         ctx.stroke()
 
 
 class LangTrayButton(HoverCanvas):
     def __init__(self):
         super().__init__(
-            44,
+            48,
             SLOT_H,
             tooltip="English (United States)\nClick for Display Scale & Search Settings (Win+I)",
             on_click=lambda *_: spawn(f"python3 '{SHELL_PY}' settings"),
@@ -541,9 +536,9 @@ class LangTrayButton(HoverCanvas):
     def on_draw(self, ctx, w, h):
         self.draw_hover_bg(ctx, w, h, radius=6.0)
         ctx.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-        ctx.set_font_size(12.2)
+        ctx.set_font_size(13.2)
         ctx.set_source_rgba(0.94, 0.98, 0.96, 0.95)
-        for txt, dy in (("ENG", -2.5), ("US", 12.2)):
+        for txt, dy in (("ENG", -2.5), ("US", 13.5)):
             ext = ctx.text_extents(txt)
             ctx.move_to((w - ext.width) / 2.0, h / 2.0 + dy)
             ctx.show_text(txt)
@@ -552,7 +547,7 @@ class LangTrayButton(HoverCanvas):
 class QuickSettingsPill(HoverCanvas):
     def __init__(self):
         super().__init__(
-            102,
+            110,
             SLOT_H,
             tooltip="Quick Settings (Win+A)",
             on_click=lambda *_: spawn(f"python3 '{SHELL_PY}' control"),
@@ -569,11 +564,11 @@ class QuickSettingsPill(HoverCanvas):
         if event.direction == Gdk.ScrollDirection.UP:
             spawn("pactl set-sink-volume @DEFAULT_SINK@ +4%")
             self.vol = min(100, self.vol + 4)
-            self.area.queue_draw()
+            self.queue_draw()
         elif event.direction == Gdk.ScrollDirection.DOWN:
             spawn("pactl set-sink-volume @DEFAULT_SINK@ -4%")
             self.vol = max(0, self.vol - 4)
-            self.area.queue_draw()
+            self.queue_draw()
         return True
 
     def refresh_status(self):
@@ -593,80 +588,80 @@ class QuickSettingsPill(HoverCanvas):
             if b:
                 self.pct, self.plugged = int(b.percent), bool(b.power_plugged)
         self.set_tooltip_text(f"{ssid}  •  Sound: {self.vol}%  •  Battery: {self.pct}%\nScroll to adjust volume • Click for Quick Settings (Win+A)")
-        self.area.queue_draw()
+        self.queue_draw()
         return True
 
     def on_draw(self, ctx, w, h):
         self.draw_hover_bg(ctx, w, h, radius=6.0)
         cy = h / 2.0
 
-        # 1. Wi-Fi (x=19)
+        # 1. Wi-Fi (x=20)
         ctx.save()
         ctx.set_source_rgba(0.95, 0.99, 0.97, 0.96 if self.wifi_on else 0.42)
-        ctx.set_line_width(1.75)
+        ctx.set_line_width(1.9)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        by = cy + 5.8
-        for r in (4.0, 7.6, 11.2):
+        by = cy + 6.4
+        for r in (4.4, 8.2, 12.0):
             ctx.new_sub_path()
-            ctx.arc(19.0, by, r, -math.pi * 0.76, -math.pi * 0.24)
+            ctx.arc(20.0, by, r, -math.pi * 0.76, -math.pi * 0.24)
             ctx.stroke()
-        ctx.arc(19.0, by + 0.2, 1.55, 0, 2 * math.pi)
+        ctx.arc(20.0, by + 0.3, 1.7, 0, 2 * math.pi)
         ctx.fill()
         ctx.restore()
 
-        # 2. Speaker (x=49)
+        # 2. Speaker (x=52)
         ctx.save()
         ctx.set_source_rgba(0.95, 0.99, 0.97, 0.96)
-        ctx.set_line_width(1.65)
+        ctx.set_line_width(1.8)
         ctx.set_line_join(cairo.LINE_JOIN_ROUND)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
-        sx = 42.0
-        ctx.move_to(sx, cy - 2.6)
-        ctx.line_to(sx + 3.0, cy - 2.6)
-        ctx.line_to(sx + 7.2, cy - 6.2)
-        ctx.line_to(sx + 7.2, cy + 6.2)
-        ctx.line_to(sx + 3.0, cy + 2.6)
-        ctx.line_to(sx, cy + 2.6)
+        sx = 45.0
+        ctx.move_to(sx, cy - 2.8)
+        ctx.line_to(sx + 3.4, cy - 2.8)
+        ctx.line_to(sx + 7.8, cy - 6.8)
+        ctx.line_to(sx + 7.8, cy + 6.8)
+        ctx.line_to(sx + 3.4, cy + 2.8)
+        ctx.line_to(sx, cy + 2.8)
         ctx.close_path()
         ctx.stroke()
         if self.muted or self.vol == 0:
-            ctx.move_to(sx + 9.5, cy - 2.8)
-            ctx.line_to(sx + 14.0, cy + 2.8)
-            ctx.move_to(sx + 14.0, cy - 2.8)
-            ctx.line_to(sx + 9.5, cy + 2.8)
+            ctx.move_to(sx + 10.2, cy - 3.0)
+            ctx.line_to(sx + 15.0, cy + 3.0)
+            ctx.move_to(sx + 15.0, cy - 3.0)
+            ctx.line_to(sx + 10.2, cy + 3.0)
             ctx.stroke()
         else:
             ctx.new_sub_path()
-            ctx.arc(sx + 7.4, cy, 3.8, -0.68, 0.68)
+            ctx.arc(sx + 8.0, cy, 4.2, -0.68, 0.68)
             ctx.stroke()
             if self.vol > 35:
                 ctx.new_sub_path()
-                ctx.arc(sx + 7.4, cy, 6.8, -0.72, 0.72)
+                ctx.arc(sx + 8.0, cy, 7.4, -0.72, 0.72)
                 ctx.stroke()
         ctx.restore()
 
-        # 3. Battery (x=79)
+        # 3. Battery (x=86)
         ctx.save()
-        bw, bh = 20.0, 11.0
-        bx = 70.0
+        bw, bh = 22.0, 12.0
+        bx = 75.0
         btop = cy - bh / 2.0
         ctx.set_source_rgba(0.95, 0.99, 0.97, 0.94)
-        ctx.set_line_width(1.5)
-        rounded_rect(ctx, bx, btop, bw, bh, 2.5)
+        ctx.set_line_width(1.65)
+        rounded_rect(ctx, bx, btop, bw, bh, 2.7)
         ctx.stroke()
 
-        ctx.move_to(bx + bw + 1.8, cy - 2.4)
-        ctx.line_to(bx + bw + 1.8, cy + 2.4)
-        ctx.set_line_width(1.8)
+        ctx.move_to(bx + bw + 2.0, cy - 2.6)
+        ctx.line_to(bx + bw + 2.0, cy + 2.6)
+        ctx.set_line_width(2.0)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
         ctx.stroke()
 
-        fw = max(2.2, (bw - 4.4) * max(0.08, min(1.0, self.pct / 100.0)))
+        fw = max(2.4, (bw - 4.8) * max(0.08, min(1.0, self.pct / 100.0)))
         if self.plugged:
             ctx.set_source_rgba(0.20, 0.83, 0.60, 0.98)
         else:
             ctx.set_source_rgba(0.95, 0.99, 0.97, 0.96)
-        rounded_rect(ctx, bx + 2.2, btop + 2.2, fw, bh - 4.4, 1.1)
+        rounded_rect(ctx, bx + 2.4, btop + 2.4, fw, bh - 4.8, 1.2)
         ctx.fill()
         ctx.restore()
 
@@ -674,7 +669,7 @@ class QuickSettingsPill(HoverCanvas):
 class ClockBellPill(HoverCanvas):
     def __init__(self):
         super().__init__(
-            122,
+            132,
             SLOT_H,
             tooltip="Notifications & Calendar (Win+N) • Made by Muheeb",
             on_click=lambda *_: spawn(f"python3 '{SHELL_PY}' notifications"),
@@ -685,7 +680,7 @@ class ClockBellPill(HoverCanvas):
         self.dnd = run_short("xfconf-query -c xfce4-notifyd -p /do-not-disturb").lower() == "true"
         now = datetime.datetime.now()
         self.set_tooltip_text(f"{now.strftime('%A, %B %d, %Y')}\nNotifications & Calendar (Win+N) • Made by Muheeb")
-        self.area.queue_draw()
+        self.queue_draw()
         return True
 
     def on_draw(self, ctx, w, h):
@@ -694,37 +689,37 @@ class ClockBellPill(HoverCanvas):
         t_str = now.strftime("%I:%M %p").lstrip("0")
         d_str = now.strftime("%m/%d/%Y")
 
-        right_x = w - 28.0
+        right_x = w - 30.0
         cy = h / 2.0
 
         ctx.select_font_face("Inter", cairo.FONT_SLANT_NORMAL, cairo.FONT_WEIGHT_NORMAL)
-        ctx.set_font_size(13.0)
+        ctx.set_font_size(14.0)
         ctx.set_source_rgba(0.95, 0.99, 0.97, 0.97)
         ext1 = ctx.text_extents(t_str)
         ctx.move_to(right_x - ext1.width, cy - 2.5)
         ctx.show_text(t_str)
 
-        ctx.set_font_size(12.2)
+        ctx.set_font_size(13.2)
         ctx.set_source_rgba(0.82, 0.90, 0.86, 0.92)
         ext2 = ctx.text_extents(d_str)
-        ctx.move_to(right_x - ext2.width, cy + 12.5)
+        ctx.move_to(right_x - ext2.width, cy + 14.0)
         ctx.show_text(d_str)
 
-        bx = w - 13.0
+        bx = w - 14.0
         ctx.set_source_rgba(0.94, 0.98, 0.96, 0.94 if not self.dnd else 0.45)
-        ctx.set_line_width(1.55)
+        ctx.set_line_width(1.7)
         ctx.set_line_cap(cairo.LINE_CAP_ROUND)
         ctx.set_line_join(cairo.LINE_JOIN_ROUND)
         ctx.new_sub_path()
-        ctx.arc(bx, cy - 1.5, 4.7, math.pi, 2 * math.pi)
-        ctx.line_to(bx + 4.7, cy + 2.6)
-        ctx.line_to(bx + 6.3, cy + 4.3)
-        ctx.line_to(bx - 6.3, cy + 4.3)
-        ctx.line_to(bx - 4.7, cy + 2.6)
+        ctx.arc(bx, cy - 1.6, 5.2, math.pi, 2 * math.pi)
+        ctx.line_to(bx + 5.2, cy + 2.8)
+        ctx.line_to(bx + 6.9, cy + 4.7)
+        ctx.line_to(bx - 6.9, cy + 4.7)
+        ctx.line_to(bx - 5.2, cy + 2.8)
         ctx.close_path()
         ctx.stroke()
         ctx.new_sub_path()
-        ctx.arc(bx, cy + 5.0, 1.7, 0, math.pi)
+        ctx.arc(bx, cy + 5.5, 1.9, 0, math.pi)
         ctx.stroke()
 
 
@@ -732,7 +727,7 @@ class ShowDesktopSliver(HoverCanvas):
     def __init__(self, wnck_screen):
         self.wnck_screen = wnck_screen
         super().__init__(
-            8,
+            9,
             BAR_HEIGHT,
             tooltip="Show desktop (Win+D)",
             on_click=self._toggle_desktop,
@@ -745,11 +740,11 @@ class ShowDesktopSliver(HoverCanvas):
     def on_draw(self, ctx, w, h):
         ctx.set_source_rgba(1.0, 1.0, 1.0, 0.24 if self.hovered else 0.14)
         ctx.set_line_width(1.0)
-        ctx.move_to(1.5, 11)
-        ctx.line_to(1.5, h - 11)
+        ctx.move_to(1.5, 12)
+        ctx.line_to(1.5, h - 12)
         ctx.stroke()
         if self.hovered:
-            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.09)
+            ctx.set_source_rgba(1.0, 1.0, 1.0, 0.10)
             ctx.rectangle(2, 0, w - 2, h)
             ctx.fill()
 
@@ -763,7 +758,6 @@ class Win11Taskbar(Gtk.Window):
         self.set_resizable(False)
         self.set_skip_taskbar_hint(True)
         self.set_skip_pager_hint(True)
-        # CRITICAL: Never steal X11 input focus when taskbar buttons are clicked!
         self.set_accept_focus(False)
         self.set_focus_on_map(False)
         self.set_type_hint(Gdk.WindowTypeHint.DOCK)
@@ -825,7 +819,7 @@ class Win11Taskbar(Gtk.Window):
             SLOT_W,
             SLOT_H,
             tooltip="Task View (Win+Tab)",
-            on_click=lambda *_: spawn("rofi -show window -theme-str 'window {background-color: #111C17; border: 1px solid #34D399; border-radius: 10px; width: 50%;}'"),
+            on_click=lambda *_: spawn("rofi -show window -theme-str 'window {background-color: #111C17; border: 1px solid #34D399; border-radius: 10px; width: 52%;}'"),
         )
         tv_btn.on_draw = lambda ctx, w, h: (
             tv_btn.draw_hover_bg(ctx, w, h, radius=6.0),
@@ -888,7 +882,7 @@ class Win11Taskbar(Gtk.Window):
         self.dynamic_slots = {}
 
         # 3. FAR-RIGHT: '⌃' Chevron + ENG/US + Quick Settings + Clock/Bell + Show Desktop
-        right_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=3)
+        right_box = Gtk.Box(orientation=Gtk.Orientation.HORIZONTAL, spacing=4)
         right_box.set_valign(Gtk.Align.CENTER)
 
         right_box.pack_start(ChevronTrayButton(), False, False, 0)

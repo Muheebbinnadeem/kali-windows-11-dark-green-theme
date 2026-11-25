@@ -93,8 +93,8 @@ def configure_permanent_persistence(install_dir):
                 "gtk-theme-name=Win11-Muheeb-Green-Dark\n"
                 "gtk-icon-theme-name=Win11-green-dark\n"
                 "gtk-cursor-theme-name=Win11-Cursors-Dark\n"
-                "gtk-cursor-theme-size=28\n"
-                "gtk-font-name=Inter 10.5\n"
+                "gtk-cursor-theme-size=32\n"
+                "gtk-font-name=Inter 11.5\n"
                 "gtk-application-prefer-dark-theme=1\n"
                 "gtk-decoration-layout=icon:minimize,maximize,close\n"
             )
@@ -123,10 +123,10 @@ def configure_permanent_persistence(install_dir):
             "X-GNOME-Autostart-enabled=true\n"
         )
 
-    # Stop active separate nm-applet / blueman-applet icons immediately
-    sh("pkill -f nm-applet")
-    sh("pkill -f blueman-applet")
-    sh("pkill -f blueman-tray")
+    # Stop active separate nm-applet / blueman-applet icons safely (bracket trick prevents self-kill)
+    sh("pkill -x nm-applet")
+    sh("pkill -x blueman-applet")
+    sh("pkill -x blueman-tray")
 
 
 def configure_all_win11_shortcuts(shell_py):
@@ -200,29 +200,29 @@ def main():
     xfset("xsettings", "/Net/ThemeName", "string", "Win11-Muheeb-Green-Dark")
     xfset("xsettings", "/Net/IconThemeName", "string", "Win11-green-dark")
     xfset("xsettings", "/Gtk/CursorThemeName", "string", "Win11-Cursors-Dark")
-    xfset("xsettings", "/Gtk/CursorThemeSize", "int", "30")
-    xfset("xsettings", "/Gtk/FontName", "string", "Inter 11")
+    xfset("xsettings", "/Gtk/CursorThemeSize", "int", "32")
+    xfset("xsettings", "/Gtk/FontName", "string", "Inter 11.5")
     xfset("xsettings", "/Gtk/DecorationLayout", "string", "icon:minimize,maximize,close")
-    xfset("xsettings", "/Xft/DPI", "int", "122")
+    xfset("xsettings", "/Xft/DPI", "int", "126")
 
     sh("gsettings set org.gnome.desktop.interface gtk-theme 'Win11-Muheeb-Green-Dark'")
     sh("gsettings set org.gnome.desktop.interface icon-theme 'Win11-green-dark'")
     sh("gsettings set org.gnome.desktop.interface cursor-theme 'Win11-Cursors-Dark'")
-    sh("gsettings set org.gnome.desktop.interface cursor-size 30")
+    sh("gsettings set org.gnome.desktop.interface cursor-size 32")
     sh("gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark'")
-    sh("gsettings set org.gnome.desktop.interface font-name 'Inter 11'")
-    sh("gsettings set org.gnome.desktop.interface text-scaling-factor 1.20")
+    sh("gsettings set org.gnome.desktop.interface font-name 'Inter 11.5'")
+    sh("gsettings set org.gnome.desktop.interface text-scaling-factor 1.25")
 
     xfset("xfwm4", "/general/theme", "string", "Win11-Muheeb-Green-Dark")
     xfset("xfwm4", "/general/button_layout", "string", "O|HMC")
     xfset("xfwm4", "/general/title_alignment", "string", "left")
-    xfset("xfwm4", "/general/title_font", "string", "Inter Semi-Bold 10.5")
+    xfset("xfwm4", "/general/title_font", "string", "Inter Semi-Bold 11")
     xfset("xfwm4", "/general/use_compositing", "bool", "true")
     xfset("xfwm4", "/general/show_popup_shadow", "bool", "false")
     xfset("xfwm4", "/general/show_dock_shadow", "bool", "false")
     xfset("xfwm4", "/general/tile_on_move", "bool", "true")
 
-    # 2. Wallpaper & 125% Windows 11 Desktop Icon Size (58px icons, 10.5pt label)
+    # 2. Wallpaper & 125%+ Windows 11 Desktop Icon Size (64px icons, 11pt label)
     for p in subprocess.run(["xfconf-query", "-c", "xfce4-desktop", "-l"], capture_output=True, text=True).stdout.splitlines():
         if p.endswith("/last-image") or p.endswith("/image-path"):
             xfset("xfce4-desktop", p, "string", wall_dark)
@@ -231,14 +231,14 @@ def main():
 
     xfset("xfce4-desktop", "/backdrop/screen0/monitoreDP-1/workspace0/last-image", "string", wall_dark)
     xfset("xfce4-desktop", "/backdrop/screen0/monitoreDP-1/workspace0/image-style", "int", "5")
-    xfset("xfce4-desktop", "/desktop-icons/icon-size", "int", "58")
-    xfset("xfce4-desktop", "/desktop-icons/font-size", "double", "10.5")
+    xfset("xfce4-desktop", "/desktop-icons/icon-size", "int", "64")
+    xfset("xfce4-desktop", "/desktop-icons/font-size", "double", "11.0")
     xfset("xfce4-desktop", "/desktop-icons/use-custom-font-size", "bool", "true")
 
     # 3. Thunar File Explorer (125%+ Spacious Folders & Sidebar)
     xfset("thunar", "/last-location-bar", "string", "ThunarLocationEntry")
     xfset("thunar", "/last-side-pane", "string", "THUNAR_SIDEPANE_TYPE_SHORTCUTS")
-    xfset("thunar", "/last-separator-position", "int", "260")
+    xfset("thunar", "/last-separator-position", "int", "265")
     xfset("thunar", "/last-icon-view-zoom-level", "string", "THUNAR_ZOOM_LEVEL_150_PERCENT")
     xfset("thunar", "/last-statusbar-visible", "bool", "true")
     xfset("thunar", "/last-menubar-visible", "bool", "false")
@@ -265,13 +265,22 @@ def main():
     xfset("xfce4-notifyd", "/notify-location", "uint", "3")
     configure_all_win11_shortcuts(shell_py)
 
-    # 5. Launch Native Windows 11 Dock Taskbar (replaces xfce4-panel cleanly: zero '⋮⋮' handles, merged running apps!)
-    sh("xfce4-panel -q")
-    sh("pkill -f win11_taskbar.py")
+    # 5. Launch Native Windows 11 Dock Taskbar (setsid-detached, kill old instance safely by PID file)
+    sh("pkill -x xfce4-panel")
+    pid_file = os.path.join(os.environ.get("XDG_RUNTIME_DIR", f"/tmp/win11-{os.getuid()}"), "win11_taskbar.pid")
+    if os.path.isfile(pid_file):
+        try:
+            old_pid = int(open(pid_file).read().strip())
+            os.kill(old_pid, 15)
+        except Exception:
+            pass
+    sh("pkill -f '[w]in11_taskbar.py'")
     taskbar_py = os.path.join(install_dir, "shell", "win11_taskbar.py")
     subprocess.Popen(
-        f"nohup python3 '{taskbar_py}' >/dev/null 2>&1 &",
-        shell=True,
+        ["python3", taskbar_py],
+        stdout=subprocess.DEVNULL,
+        stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL,
         start_new_session=True,
     )
     sh("xfdesktop --reload")

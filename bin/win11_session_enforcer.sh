@@ -7,9 +7,9 @@ WALL_DARK="$INSTALL_DIR/wallpapers/win11-muheeb-dark.png"
 SETTINGS_JSON="$HOME/.config/win11-muheeb/settings.json"
 
 # 1. Stop separate Linux Wi-Fi / Bluetooth tray icons (managed inside Win+A Quick Settings)
-pkill -f nm-applet >/dev/null 2>&1 || true
-pkill -f blueman-applet >/dev/null 2>&1 || true
-pkill -f blueman-tray >/dev/null 2>&1 || true
+pkill -x nm-applet >/dev/null 2>&1 || true
+pkill -x blueman-applet >/dev/null 2>&1 || true
+pkill -x blueman-tray >/dev/null 2>&1 || true
 
 # Read user's chosen scale percentage (defaults to 125% -> 120 DPI)
 DPI_VAL=$(python3 - <<'PY'
@@ -21,25 +21,26 @@ if os.path.isfile(p):
         scale = int(json.load(open(p)).get("scale_pct", 125))
     except Exception:
         pass
-print(max(96, min(168, int(round(96 * scale / 100.0)))))
+print(max(96, min(168, int(round(100.8 * scale / 100.0)))))
 PY
 )
 
-# 2. Enforce Windows 11 125% (120 DPI) theme, icons, cursors & fonts
+# 2. Enforce Windows 11 125%+ (126 DPI) theme, icons, cursors & fonts
 xfconf-query -c xsettings -p /Net/ThemeName -n -t string -s "Win11-Muheeb-Green-Dark" 2>/dev/null || true
 xfconf-query -c xsettings -p /Net/IconThemeName -n -t string -s "Win11-green-dark" 2>/dev/null || true
 xfconf-query -c xsettings -p /Gtk/CursorThemeName -n -t string -s "Win11-Cursors-Dark" 2>/dev/null || true
-xfconf-query -c xsettings -p /Gtk/CursorThemeSize -n -t int -s 28 2>/dev/null || true
-xfconf-query -c xsettings -p /Gtk/FontName -n -t string -s "Inter 10.5" 2>/dev/null || true
+xfconf-query -c xsettings -p /Gtk/CursorThemeSize -n -t int -s 32 2>/dev/null || true
+xfconf-query -c xsettings -p /Gtk/FontName -n -t string -s "Inter 11.5" 2>/dev/null || true
 xfconf-query -c xsettings -p /Xft/DPI -n -t int -s "$DPI_VAL" 2>/dev/null || true
 xfconf-query -c xfwm4 -p /general/theme -n -t string -s "Win11-Muheeb-Green-Dark" 2>/dev/null || true
 
 gsettings set org.gnome.desktop.interface gtk-theme 'Win11-Muheeb-Green-Dark' 2>/dev/null || true
 gsettings set org.gnome.desktop.interface icon-theme 'Win11-green-dark' 2>/dev/null || true
 gsettings set org.gnome.desktop.interface cursor-theme 'Win11-Cursors-Dark' 2>/dev/null || true
-gsettings set org.gnome.desktop.interface cursor-size 28 2>/dev/null || true
+gsettings set org.gnome.desktop.interface cursor-size 32 2>/dev/null || true
 gsettings set org.gnome.desktop.interface color-scheme 'prefer-dark' 2>/dev/null || true
-gsettings set org.gnome.desktop.interface font-name 'Inter 10.5' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface font-name 'Inter 11.5' 2>/dev/null || true
+gsettings set org.gnome.desktop.interface text-scaling-factor 1.25 2>/dev/null || true
 
 # 3. Ensure Wallpaper stays locked to Win11 Dark Green (Made by Muheeb)
 if [ -f "$WALL_DARK" ]; then
@@ -49,9 +50,9 @@ if [ -f "$WALL_DARK" ]; then
 fi
 
 # 4. Replace xfce4-panel with Native Windows 11 Dock Taskbar on every boot/login
-xfce4-panel -q >/dev/null 2>&1 || true
-pkill -f win11_taskbar.py >/dev/null 2>&1 || true
-nohup python3 "$INSTALL_DIR/shell/win11_taskbar.py" >/dev/null 2>&1 &
+pkill -x xfce4-panel >/dev/null 2>&1 || true
+pkill -f '[w]in11_taskbar.py' >/dev/null 2>&1 || true
+setsid -f python3 "$INSTALL_DIR/shell/win11_taskbar.py" >/dev/null 2>&1 < /dev/null
 
 # 5. Ensure Windows Key solo tap triggers <Primary>Escape -> Windows 11 Start Menu
 if command -v xcape >/dev/null 2>&1; then

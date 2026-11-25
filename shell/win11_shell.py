@@ -602,8 +602,8 @@ class BaseFlyout(Gtk.Window):
 
     def _calc_clamped_pos(self, w, h):
         mx, my, mw, mh = get_primary_geometry()
-        panel_h = 56
-        gap = 12
+        panel_h = 60
+        gap = 14
         if self._align == "center":
             x = mx + (mw - w) // 2
             y = my + mh - panel_h - h - gap
@@ -615,14 +615,14 @@ class BaseFlyout(Gtk.Window):
             y = my + mh - panel_h - h - gap
         elif self._align == "top-center":
             x = mx + (mw - w) // 2
-            y = my + 22
+            y = my + 24
         else:
             x = mx + (mw - w) // 2
             y = my + (mh - h) // 2
 
         # Strict screen-boundary clamping so NO flyout can EVER go off-screen!
-        x = max(mx + 8, min(x, mx + mw - w - 8))
-        y = max(my + 8, min(y, my + mh - panel_h - h - 8))
+        x = max(mx + 10, min(x, mx + mw - w - 10))
+        y = max(my + 10, min(y, my + mh - panel_h - h - 10))
         return x, y
 
     def _on_size_allocate(self, widget, alloc):
@@ -665,6 +665,9 @@ class BaseFlyout(Gtk.Window):
         self.show_all()
         self.move(*self.target_pos)
         self.present_with_time(Gdk.CURRENT_TIME)
+        gdk_win = self.get_window()
+        if gdk_win:
+            gdk_win.focus(Gdk.CURRENT_TIME)
 
 
 # ==============================================================================
@@ -1278,7 +1281,7 @@ class CustomizableSearchFlyout(BaseFlyout):
 # ==============================================================================
 class ControlCenterFlyout(BaseFlyout):
     def __init__(self):
-        super().__init__(396, 510, align="right")
+        super().__init__(416, 530, align="right")
 
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=0)
         card.get_style_context().add_class("mica-card")
